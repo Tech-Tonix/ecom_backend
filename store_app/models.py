@@ -5,12 +5,11 @@ from django.core.validators import RegexValidator
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, username, email, password=None):
-        if not username :
-            raise ValueError("the given username is not valid")
+    def create_user(self, email, password=None):
+        if not email:
+            raise ValueError("the given email is not valid")
         
         user = self.model(
-            username= username ,
             email=self.normalize_email(email),
             )
         
@@ -18,9 +17,8 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
     
-    def create_superuser(self,username, email, password):
+    def create_superuser(self, email, password):
         user = self.create_user(
-            username=username,
             password=password,
             email=self.normalize_email(email),    
         )
@@ -33,13 +31,13 @@ class CustomUserManager(BaseUserManager):
     
 
 class CustomUser(AbstractBaseUser):
-    username=models.CharField(max_length=30,unique=True)
+    username=None
     first_name=models.CharField(max_length=30)
     last_name=models.CharField(max_length=30)
     email=models.EmailField(max_length=60, unique=True)
     phone_number=models.CharField(max_length=10,validators=[RegexValidator(regex='^[0-9]+$')])
     birth_date=models.DateField(default=None,null=True)
-    profile_image=models.ImageField(null=True)
+    profile_image=models.ImageField(null=True,blank=True)
     city=models.CharField(max_length=10)
     address=models.CharField(max_length=60)
     postal_code=models.CharField(max_length=5,validators=[RegexValidator(regex='^[0-9]+$')])
@@ -52,11 +50,11 @@ class CustomUser(AbstractBaseUser):
     # credit_card_info=
 
     objects= CustomUserManager()
-    USERNAME_FIELD='username'
-    REQUIRED_FIELDS = ['email']
+    USERNAME_FIELD='email'
+    REQUIRED_FIELDS = []
 
     def __str__(self) :
-        return self.username + ' - '+ self.email
+        return  self.email
     
     def has_perm(self,perm,obj=None):
         return self.is_admin
