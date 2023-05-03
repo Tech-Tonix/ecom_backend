@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'store_app',
+    'core',
     'rest_framework.authtoken',
     'allauth',
     'allauth.account',
@@ -141,7 +141,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-AUTH_USER_MODEL='store_app.CustomUser'
+AUTH_USER_MODEL='core.CustomUser'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -164,8 +164,9 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
 REST_AUTH_SERIALIZERS = {
-    "USER_DETAILS_SERIALIZER": "store_app.serializers.CustomUserDetailsSerializer",
+    "USER_DETAILS_SERIALIZER": "core.serializers.CustomUserDetailsSerializer",
 }
 REST_AUTH_REGISTER_SERIALIZERS = {
-    "REGISTER_SERIALIZER": "store_app.serializers.CustomRegisterSerializer",
+    "REGISTER_SERIALIZER": "core.serializers.CustomRegisterSerializer",
 }
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
