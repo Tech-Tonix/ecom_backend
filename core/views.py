@@ -1,15 +1,13 @@
-# from django.shortcuts import render
-# from .models import CustomUser
-# from .serializer import UserSerializer
-# from rest_framework.views import APIView
-# from rest_framework import generics , mixins
-# from rest_auth.registration.views import RegisterView
+from rest_framework import viewsets
+from models import *
+from serializers import *
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 
-# class CustomRegisterView(RegisterView):
-#     queryset= CustomUser.objects.all()
+class ProductsViewSet(viewsets.ModelViewSet):
 
-
-# class UserAPIView(APIView):
-#     def get
-
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
