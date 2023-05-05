@@ -1,4 +1,4 @@
-from .models import CustomUser, Category, Product
+from .models import CustomUser
 from rest_framework import serializers
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
@@ -78,22 +78,4 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['first_name','last_name','email','birth_date','phone_number','address']
 
-
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ['id', 'title', 'products_count']
-
-    products_count = serializers.IntegerField(read_only=True)
-
-
-
-
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = ['id', 'name', 'description', 'inventory',
-                  'unit_price', 'Category']
 

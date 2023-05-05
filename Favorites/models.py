@@ -1,5 +1,5 @@
 from django.db import models
-from core.models import Product
+from Store.models import Product
 
 
 class Favorites(models.Model):
