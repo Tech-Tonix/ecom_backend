@@ -11,4 +11,5 @@ urlpatterns = [
      name='account_email_verification_sent'),
     re_path(r'^account-confirm-email/(?P<key>[-:\w]+)/$', VerifyEmailView.as_view(),
      name='account_confirm_email'),
+    path('store/', include('core.urls')),
 ]
