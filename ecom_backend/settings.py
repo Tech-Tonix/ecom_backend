@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-3f0*fuhdcm3qfu9)%i%(evx4w6n-bqs_(%kk()s%(@zp_pu)v%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 
@@ -176,5 +176,3 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     "REGISTER_SERIALIZER": "core.serializers.CustomRegisterSerializer",
 }
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-ALLOWED_HOST = "*"
