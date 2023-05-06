@@ -1,10 +1,10 @@
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from rest_framework import viewsets
+from rest_framework import viewsets , status
 from rest_framework.response import Response
 from .models import *
 from .serializers import *
-
+from rest_framework.permissions import IsAdminUser , IsAuthenticated
 
 
 class ProductsViewSet(viewsets.ModelViewSet):
@@ -66,3 +66,39 @@ class CartItemViewSet(ModelViewSet):
         return CartItem.objects \
             .filter(cart_id=self.kwargs['cart_pk']) \
             .select_related('product')
+
+
+
+class OrderViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
+
+    def get_permissions(self): 
+        if self.request.method in ['PATCH', 'DELETE']: #only the admin can update or delete the order
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
+
+    def create(self, request, *args, **kwargs):
+        serializer = CreateOrderSerializer(
+            data=request.data,
+            context={'user_id': self.request.user.id})
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateOrderSerializer
+        elif self.request.method == 'PATCH':
+            return UpdateOrderSerializer
+        return OrderSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_staff:
+            return Order.objects.all()
+
+        customer_id = CustomUser.objects.only(
+            'id').get(user_id=user.id)
+        return Order.objects.filter(customer_id=customer_id)

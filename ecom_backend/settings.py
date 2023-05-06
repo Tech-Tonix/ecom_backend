@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'rest_auth',
     'rest_auth.registration',
     'allauth.socialaccount',
+    'corsheaders',
+    'drf_yasg',
 ]
 
 REST_FRAMEWORK = {
@@ -67,6 +69,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'ecom_backend.urls'
@@ -176,3 +180,7 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     "REGISTER_SERIALIZER": "core.serializers.CustomRegisterSerializer",
 }
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]

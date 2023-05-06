@@ -5,5 +5,5 @@ router = routers.DefaultRouter()
 router.register('carts', views.CartViewSet)
 router.register('products', views.ProductsViewSet, basename='products')
 router.register('Categories', views.CategoryViewSet)
-
+router.register('orders', views.OrderViewSet, basename='orders')
 urlpatterns = router.urls

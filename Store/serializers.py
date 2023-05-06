@@ -1,9 +1,11 @@
-from .models import  Category, Product, CartItem ,Cart
+from .models import  Category, Product, CartItem ,Cart , Order, OrderItem
 from rest_framework import serializers
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
 from ecom_backend import settings
 from core.models import CustomUser
+from django.db import transaction
+# from .signals import order_created
 
 
 
@@ -29,6 +31,9 @@ class SimpleProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['title', 'unit_price']
+
+
+#####################################################CART#########################################################
 
 
 
@@ -92,7 +97,79 @@ class AddCartItemSerializer(serializers.ModelSerializer):
         fields = [ 'product_id', 'quantity']
 
 
+
+
 class UpdateCartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
         fields = ['quantity']
+
+
+################################################ORDERS############################################################
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    product = SimpleProductSerializer()
+
+    class Meta:
+        model = OrderItem
+        fields = ['product', 'unit_price', 'quantity']
+
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True)
+
+    class Meta:
+        model = Order
+        fields = [ 'customer', 'placed_at', 'payment_status', 'items']
+
+
+
+
+class UpdateOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['payment_status']
+
+
+
+
+
+class CreateOrderSerializer(serializers.Serializer):
+    cart_id = serializers.UUIDField()
+
+
+    def validate_cart_id(self, cart_id): #test if the cart is empty oe deleted and raise validation error
+        if not Cart.objects.filter(pk=cart_id).exists():
+            raise serializers.ValidationError(
+                'No cart with the given ID was found.')
+        if CartItem.objects.filter(cart_id=cart_id).count() == 0:
+            raise serializers.ValidationError('The cart is empty.')
+        return cart_id
+
+    def save(self, **kwargs):
+        with transaction.atomic(): # we use it so the whole code works together and in case of internet cut the transaction doesn't stop in middle
+            cart_id = self.validated_data['cart_id']
+
+            customer = CustomUser.objects.get(
+                user_id=self.context['user_id'])
+            order = Order.objects.create(customer=customer)
+
+            cart_items = CartItem.objects \
+                .select_related('product') \
+                .filter(cart_id=cart_id)
+            order_items = [
+                OrderItem(
+                    order=order,
+                    product=item.product,
+                    unit_price=item.product.unit_price,
+                    quantity=item.quantity
+                ) for item in cart_items
+            ]
+            OrderItem.objects.bulk_create(order_items)
+
+            Cart.objects.filter(pk=cart_id).delete()
+
+            # order_created.send_robust(self.__class__, order=order)
+
+            return order
