@@ -15,7 +15,7 @@ class ProductsViewSet(viewsets.ModelViewSet):
     def get_permissions(self): 
         if self.request.method in ['PATCH', 'DELETE','POST','PUT']: #only the admin can update or delete the order
             return [IsAdminUser()]
-        return [IsAuthenticated()]
+        return []
 
 
     def get_serializer_context(self):
