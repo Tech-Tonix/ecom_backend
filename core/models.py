@@ -57,7 +57,7 @@ class CustomUser(AbstractBaseUser):
         return  self.email
     
     def has_perms(self,perm,obj=None):
-        return self.is_active
+        return True
     
     def has_perm(self,perm,obj=None):
         return self.is_admin

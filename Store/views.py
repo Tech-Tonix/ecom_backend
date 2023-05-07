@@ -12,14 +12,13 @@ class ProductsViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
-    def get_permissions(self): 
-        if self.request.method in ['PATCH', 'DELETE','POST','PUT']: #only the admin can update or delete the order
-            return [IsAdminUser()]
-        return [IsAuthenticated()]
-
-
     def get_serializer_context(self):
         return {'request': self.request}
+
+    def get_permissions(self): 
+        if self.request.method in ['PATCH', 'DELETE','POST']: #only the admin can update or delete the order
+            return [IsAdminUser()]
+        return []
 
     def destroy(self, request, *args, **kwargs):
         if OrderItem.objects.filter(product_id=kwargs['pk']).count() > 0:
