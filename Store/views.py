@@ -16,7 +16,7 @@ class ProductsViewSet(viewsets.ModelViewSet):
         return {'request': self.request}
 
     def get_permissions(self): 
-        if self.request.method in ['PATCH', 'DELETE','POST']: #only the admin can update or delete the order
+        if self.request.method in ['PATCH', 'DELETE','POST','PUT']: #only the admin can update or delete the order
             return [IsAdminUser()]
         return []
 
