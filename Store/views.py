@@ -29,7 +29,7 @@ class ProductsViewSet(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
     
 
-class ProductDetail(generics.RetrieveAPIView):
+class ProductDetail(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'id'
