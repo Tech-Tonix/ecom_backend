@@ -30,7 +30,7 @@ class Product(models.Model):
         validators=[MinValueValidator(1)])
     inventory = models.IntegerField(validators=[MinValueValidator(0)])
     last_update = models.DateTimeField(auto_now=True)
-    Category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='products')
+    Category = models.ManyToManyField(Category, related_name='products')
     promotions = models.ManyToManyField(Promotion, blank=True)
     image = models.ImageField(blank=True, null=True)
 
