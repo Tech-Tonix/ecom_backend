@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from .models import *
 from .serializers import *
 from rest_framework.permissions import IsAdminUser , IsAuthenticated
+from rest_framework import generics
 
 
 class ProductsViewSet(viewsets.ModelViewSet):
@@ -27,6 +28,11 @@ class ProductsViewSet(viewsets.ModelViewSet):
 
         return super().destroy(request, *args, **kwargs)
     
+
+class ProductDetail(generics.RetrieveAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = 'id'
 
 
 

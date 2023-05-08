@@ -26,7 +26,6 @@ class ProductSerializer(serializers.ModelSerializer):
                   'unit_price', 'Category','image']
         
 
-
 class SimpleProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
