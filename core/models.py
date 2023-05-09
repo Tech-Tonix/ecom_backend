@@ -1,11 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
 from django.core.validators import RegexValidator
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, password=None):
+    def create_user(self, email, password=None, **kwargs):
         if not email:
             raise ValueError("the given email is not valid")
         
@@ -30,7 +30,7 @@ class CustomUserManager(BaseUserManager):
         return user
     
 
-class CustomUser(AbstractBaseUser):
+class CustomUser(AbstractBaseUser,PermissionsMixin):
     username=None
     first_name=models.CharField(max_length=30)
     last_name=models.CharField(max_length=30)
@@ -51,19 +51,22 @@ class CustomUser(AbstractBaseUser):
 
     objects= CustomUserManager()
     USERNAME_FIELD='email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     def __str__(self) :
         return  self.email
     
-    def has_perms(self,perm,obj=None):
-        return True
+    # def has_perms(self,perm,obj=None):
+    #     return True
     
-    def has_perm(self,perm,obj=None):
-        return self.is_admin
+    # def has_perm(self,perm,obj=None):
+    #     return self.is_admin
     
-    def has_module_perms(self,app_label):
-        return True
+    # def has_module_perms(self,app_label):
+    #     return True
+    
+    def get_full_name(self):
+        return f"{self.first_name}{self.last_name}"
 
 
 

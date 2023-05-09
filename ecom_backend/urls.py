@@ -22,13 +22,16 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),
-    path('rest-auth/', include('rest_auth.urls')),
-    path('rest-auth/registration/', include('rest_auth.registration.urls')),
-    re_path(r'^account-confirm-email/', VerifyEmailView.as_view(),
-     name='account_email_verification_sent'),
-    re_path(r'^account-confirm-email/(?P<key>[-:\w]+)/$', VerifyEmailView.as_view(),
-     name='account_confirm_email'),
+   #  path('api-auth/', include('rest_framework.urls')),
+   #  path('rest-auth/', include('rest_auth.urls')),
+   #  path('rest-auth/registration/', include('rest_auth.registration.urls')),
+   #  re_path(r'^account-confirm-email/', VerifyEmailView.as_view(),
+   #   name='account_email_verification_sent'),
+   #  re_path(r'^account-confirm-email/(?P<key>[-:\w]+)/$', VerifyEmailView.as_view(),
+   #   name='account_confirm_email'),
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
+    path('auth/', include('djoser.social.urls')),
     path('store/', include('Store.urls')),
     path ('swagger/schema', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
