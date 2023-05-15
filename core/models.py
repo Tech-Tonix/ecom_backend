@@ -5,16 +5,26 @@ from django.core.validators import RegexValidator
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, password=None, **kwargs):
+    def create_user(self, email,first_name,last_name,phone_number,birth_date,city,address,postal_code,is_student,is_member_club,is_active=True,password=None, **kwargs):
         if not email:
             raise ValueError("the given email is not valid")
         
         user = self.model(
             email=self.normalize_email(email),
+            first_name= first_name,
+            last_name=last_name,
+            phone_number= phone_number,
+            birth_date=birth_date,
+            city= city,
+            address=address,
+            postal_code= postal_code,
+            is_student= is_student,
+            is_member_club=is_member_club,
+            is_active=is_active,
             )
         
         user.set_password(password)
-        user.save(using=self._db)
+        user.save()
         return user
     
     def create_superuser(self, email, password):
@@ -46,6 +56,7 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     is_admin=models.BooleanField(default=False)
     is_staff=models.BooleanField(default=False)
     is_superuser=models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     date_joined=models.DateField(default=timezone.now())
     # credit_card_info=
 
