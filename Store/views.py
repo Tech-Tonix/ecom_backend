@@ -13,12 +13,19 @@ class ProductsViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> feature/differentAuths
     def get_permissions(self): 
         if self.request.method in ['PATCH', 'DELETE','POST','PUT']: #only the admin can update or delete the order
             return [IsAdminUser()]
         return []
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> feature/differentAuths
     def get_serializer_context(self):
         return {'request': self.request}
 

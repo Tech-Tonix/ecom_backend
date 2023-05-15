@@ -9,9 +9,10 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 import os
+from django.core.management.utils import get_random_secret_key
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,15 +25,29 @@ CORS_ALLOW_CREDENTIALS = True
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-3f0*fuhdcm3qfu9)%i%(evx4w6n-bqs_(%kk()s%(@zp_pu)v%'
+# SECRET_KEY = 'django-insecure-3f0*fuhdcm3qfu9)%i%(evx4w6n-bqs_(%kk()s%(@zp_pu)v%'
+SECRET_KEY = get_random_secret_key()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
+<<<<<<< HEAD
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+=======
+>>>>>>> feature/differentAuths
 
+
+# STATIC_URL=''
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+# STATICFILES_DIRS =[
+#     os.path.join(BASE_DIR,'build/static')
+# ]
+
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 # Application definition
 
@@ -51,17 +66,45 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'allauth',
     'allauth.account',
-    'rest_auth',
-    'rest_auth.registration',
-    'allauth.socialaccount',
     'corsheaders',
     'drf_yasg',
+    'djoser',
+    'social_django',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        # 'rest_framework.permissions.IsAuthenticated'
     ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('JWT',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+}
+
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    # 'SOCIAL_AUTH_TOKEN_STRATEGY': 'djoser.social.token.jwt.TokenStrategy',
+    # 'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': ['http://127.0.0.1:3000', 'http://127.0.0.1:3000/home','http://127.0.0.1:3000/login'],
+    'SERIALIZERS': {
+        "user_create": "core.serializers.UserCreateSerializer",
+        "current_user": "core.serializers.UserSerializer",
+        "user_delete": "djoser.serializers.UserSerializer",
+        'activation': 'djoser.serializers.ActivationSerializer',
+    },
+    'TOKEN_MODEL': 'rest_framework_simplejwt.tokens.AccessToken',
+    'HIDE_USERS': False,
+    'SEND_ACTIVATION_EMAIL': True,
+
 }
 
 MIDDLEWARE = [
@@ -74,6 +117,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+<<<<<<< HEAD
+=======
+    'social_django.middleware.SocialAuthExceptionMiddleware',
+>>>>>>> feature/differentAuths
 ]
 
 ROOT_URLCONF = 'ecom_backend.urls'
@@ -162,20 +209,14 @@ AUTH_USER_MODEL='core.CustomUser'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-AUTHENTICATION_BACKENDS = [
-    # allauth specific authentication methods, such as login by e-mail
-    'allauth.account.auth_backends.AuthenticationBackend',
-    # Needed to login by username in Django admin, regardless of allauth
+AUTHENTICATION_BACKENDS = (
+    # 'social_core.backends.google.GoogleOAuth2',
+    # 'social_core.backends.facebook.FacebookOAuth2',
     'django.contrib.auth.backends.ModelBackend',
-]
+)
 
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
+<<<<<<< HEAD
 REST_AUTH_SERIALIZERS = {
     "USER_DETAILS_SERIALIZER": "core.serializers.CustomUserDetailsSerializer",
 }
@@ -183,3 +224,35 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     "REGISTER_SERIALIZER": "core.serializers.CustomRegisterSerializer",
 }
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+=======
+# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+# ACCOUNT_EMAIL_REQUIRED = True
+# ACCOUNT_USERNAME_REQUIRED = False
+# ACCOUNT_AUTHENTICATION_METHOD = "email"
+# ACCOUNT_UNIQUE_EMAIL = True
+# ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+
+# REST_AUTH_SERIALIZERS = {
+#     "USER_DETAILS_SERIALIZER": "core.serializers.CustomUserDetailsSerializer",
+# }
+# REST_AUTH_REGISTER_SERIALIZERS = {
+#     "REGISTER_SERIALIZER": "core.serializers.CustomRegisterSerializer",
+# }
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:3000',
+# ]
+
+# CORS HEADERS
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
+
+EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST ='smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'ratg5162@gmail.com'
+EMAIL_HOST_PASSWORD ='gymRAt@5162'
+EMAIL_USE_TLS =True
+>>>>>>> feature/differentAuths

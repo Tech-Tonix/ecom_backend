@@ -32,7 +32,7 @@ class Product(models.Model):
     last_update = models.DateTimeField(auto_now=True)
     Category = models.ManyToManyField(Category, related_name='products')
     promotions = models.ManyToManyField(Promotion, blank=True)
-    image = models.ImageField(blank=True, null=True)
+    image = models.ImageField(blank=True, null=True,upload_to='product_images/')
 
     def __str__(self) -> str:
         return self.name
