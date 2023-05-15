@@ -10,11 +10,11 @@ from django.db import transaction
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    category_name = serializers.CharField(source = 'categories.title',read_only = True)
+    categories_title= serializers.CharField(source = 'categories.title',read_only = True)
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'inventory',
-                  'unit_price', 'categories','category_name','image']
+                  'unit_price', 'categories','categories_title','image']
 
 
 
