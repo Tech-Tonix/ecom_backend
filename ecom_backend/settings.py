@@ -17,9 +17,6 @@ from django.core.management.utils import get_random_secret_key
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-CORS_ORIGIN_ALLOW_ALL = True
-
-CORS_ALLOW_CREDENTIALS = True 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -32,11 +29,6 @@ SECRET_KEY = get_random_secret_key()
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-<<<<<<< HEAD
-
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-=======
->>>>>>> feature/differentAuths
 
 
 # STATIC_URL=''
@@ -52,6 +44,7 @@ MEDIA_URL = '/media/'
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -117,10 +110,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-<<<<<<< HEAD
-=======
     'social_django.middleware.SocialAuthExceptionMiddleware',
->>>>>>> feature/differentAuths
 ]
 
 ROOT_URLCONF = 'ecom_backend.urls'
@@ -216,15 +206,6 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-<<<<<<< HEAD
-REST_AUTH_SERIALIZERS = {
-    "USER_DETAILS_SERIALIZER": "core.serializers.CustomUserDetailsSerializer",
-}
-REST_AUTH_REGISTER_SERIALIZERS = {
-    "REGISTER_SERIALIZER": "core.serializers.CustomRegisterSerializer",
-}
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-=======
 # ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 # ACCOUNT_EMAIL_REQUIRED = True
 # ACCOUNT_USERNAME_REQUIRED = False
@@ -255,4 +236,3 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'ratg5162@gmail.com'
 EMAIL_HOST_PASSWORD ='gymRAt@5162'
 EMAIL_USE_TLS =True
->>>>>>> feature/differentAuths
