@@ -9,27 +9,30 @@ from django.db import transaction
 
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ['id', 'title', 'products_count']
-
-    products_count = serializers.IntegerField(read_only=True)
-
-
-
-
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'inventory',
-                  'unit_price', 'Category','image']
-        
+                  'unit_price', 'categories','image']
+
+
 
 class SimpleProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['title', 'unit_price']
+
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    products = ProductSerializer(many=True, read_only=True)
+    class Meta:
+        model = Category
+        fields = ['id', 'title', 'products']
+
+    # products_count = serializers.IntegerField(read_only=True)
+
+
 
 
 #####################################################CART#########################################################

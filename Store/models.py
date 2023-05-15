@@ -14,8 +14,8 @@ class Promotion(models.Model):
 
 class Category(models.Model):
     title = models.CharField(max_length=255)
-    featured_product = models.ForeignKey(
-        'Product', on_delete=models.SET_NULL, null=True, related_name='+', blank=True)
+    # featured_products = models.ManyToManyField(
+    #     'Product', null=True, related_name='+', blank=True)
 
     def __str__(self) -> str:
         return self.title
@@ -30,12 +30,13 @@ class Product(models.Model):
         validators=[MinValueValidator(1)])
     inventory = models.IntegerField(validators=[MinValueValidator(0)])
     last_update = models.DateTimeField(auto_now=True)
-    Category = models.ManyToManyField(Category, related_name='products')
+    categories = models.ManyToManyField(Category, related_name='products')
     promotions = models.ManyToManyField(Promotion, blank=True)
     image = models.ImageField(blank=True, null=True,upload_to='product_images/')
 
     def __str__(self) -> str:
         return self.name
+    
 
 
 
