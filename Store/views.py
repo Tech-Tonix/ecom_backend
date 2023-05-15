@@ -6,13 +6,20 @@ from .models import *
 from .serializers import *
 from rest_framework.permissions import IsAdminUser , IsAuthenticated
 from rest_framework import generics
+import django_filters.rest_framework as  filters
+from rest_framework.filters import SearchFilter , OrderingFilter
+from .filter import *
+
 
 
 class ProductsViewSet(viewsets.ModelViewSet):
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-
+    filter_backends = [filters.DjangoFilterBackend,SearchFilter,OrderingFilter]
+    filterset_class = ProductFilter
+    search_fields = ['name','unit_price','Category__title','promotions__discount']
+    order_fields = ['name','unit_price','promotions__discount','inventory']
     def get_permissions(self): 
         if self.request.method in ['PATCH', 'DELETE','POST','PUT']: #only the admin can update or delete the order
             return [IsAdminUser()]

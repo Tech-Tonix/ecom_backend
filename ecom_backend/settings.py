@@ -44,6 +44,7 @@ MEDIA_URL = '/media/'
 # Application definition
 
 INSTALLED_APPS = [
+    'django_filters',
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
