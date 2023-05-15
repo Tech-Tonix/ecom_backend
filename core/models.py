@@ -5,40 +5,23 @@ from django.core.validators import RegexValidator
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email,first_name,last_name,phone_number,birth_date,city,address,postal_code,is_student,is_member_club,is_active=True,password=None, **kwargs):
+    def create_user(self, email, password=None, **extra_fields):
         if not email:
-            raise ValueError("the given email is not valid")
-        
-        user = self.model(
-            email=self.normalize_email(email),
-            first_name= first_name,
-            last_name=last_name,
-            phone_number= phone_number,
-            birth_date=birth_date,
-            city= city,
-            address=address,
-            postal_code= postal_code,
-            is_student= is_student,
-            is_member_club=is_member_club,
-            is_active=is_active,
-            )
-        
+            raise ValueError("User must have an email")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
-        user.save()
-        return user
-    
-    def create_superuser(self, email, password):
-        user = self.create_user(
-            password=password,
-            email=self.normalize_email(email),    
-        )
-
-        user.is_admin=True
-        user.is_staff=True
-        user.is_superuser=True
         user.save(using=self._db)
         return user
-    
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        user = self.create_user( email, password=password, **extra_fields)
+        user.is_active = True
+        user.is_staff = True
+        user.is_admin = True
+        user.is_superuser= True
+        user.save(using=self._db)
+        return user
 
 class CustomUser(AbstractBaseUser,PermissionsMixin):
     username=None
@@ -62,7 +45,7 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
 
     objects= CustomUserManager()
     USERNAME_FIELD='email'
-    REQUIRED_FIELDS = ['first_name', 'last_name']
+    REQUIRED_FIELDS = []
 
     def __str__(self) :
         return  self.email
@@ -78,6 +61,8 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     
     def get_full_name(self):
         return f"{self.first_name}{self.last_name}"
+    
+
 
 
 

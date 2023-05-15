@@ -86,8 +86,6 @@ SIMPLE_JWT = {
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
-    # 'SOCIAL_AUTH_TOKEN_STRATEGY': 'djoser.social.token.jwt.TokenStrategy',
-    # 'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': ['http://127.0.0.1:3000', 'http://127.0.0.1:3000/home','http://127.0.0.1:3000/login'],
     'SERIALIZERS': {
         "user_create": "core.serializers.UserCreateSerializer",
         "current_user": "core.serializers.UserSerializer",
@@ -96,7 +94,8 @@ DJOSER = {
     },
     'TOKEN_MODEL': 'rest_framework_simplejwt.tokens.AccessToken',
     'HIDE_USERS': False,
-    'SEND_ACTIVATION_EMAIL': True,
+    # 'ACTIVATION_URL': '/activate/{uid}/{token}/',
+    'SEND_ACTIVATION_EMAIL': False,
 
 }
 
@@ -230,9 +229,9 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 
-EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST ='smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'ratg5162@gmail.com'
-EMAIL_HOST_PASSWORD ='gymRAt@5162'
-EMAIL_USE_TLS =True
+# EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST ='smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'ratg5162@gmail.com'
+# EMAIL_HOST_PASSWORD ='gymRAt@5162'
+# EMAIL_USE_TLS =True
