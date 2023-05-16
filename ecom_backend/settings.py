@@ -44,7 +44,6 @@ MEDIA_URL = '/media/'
 # Application definition
 
 INSTALLED_APPS = [
-    'django_filters',
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -57,6 +56,9 @@ INSTALLED_APPS = [
     'Store',
     'Favorites',
     'Reviews',
+    'ecom_backend',
+
+    'django_filters',
     'rest_framework.authtoken',
     'allauth',
     'allauth.account',

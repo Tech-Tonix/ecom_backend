@@ -12,4 +12,10 @@ class Review(models.Model):
     content = models.TextField()
     rating = models.PositiveIntegerField()
     image = models.ImageField(blank=True, null=True)
+    active = models.BooleanField(default=True)
+    # created_at = models.DateTimeField(auto_now_add=True)
+    # updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.product.name + " rating's is " + str(self.rating)
 

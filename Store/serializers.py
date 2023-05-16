@@ -5,12 +5,15 @@ from allauth.account.utils import setup_user_email
 from ecom_backend import settings
 from core.models import CustomUser
 from django.db import transaction
+from Reviews.serializers import *
 # from .signals import order_created
 
 
 
 class ProductSerializer(serializers.ModelSerializer):
     categories_title= serializers.CharField(source = 'categories.title',read_only = True)
+    reviews = ReviewSerializer(many=True,read_only = True)
+    
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'inventory',
