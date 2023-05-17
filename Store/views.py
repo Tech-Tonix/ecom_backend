@@ -42,11 +42,13 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 
     def destroy(self, request, *args, **kwargs):
-        if Product.objects.filter(collection_id=kwargs['pk']):
-            return Response({'error': 'Collection cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        if Product.objects.filter(categories_id=kwargs['pk']):
+            return Response({'error': 'Category cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
         return super().destroy(request, *args, **kwargs)
     
+
+
 
 
 
