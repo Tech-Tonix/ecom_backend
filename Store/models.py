@@ -32,6 +32,8 @@ class Product(models.Model):
     last_update = models.DateTimeField(auto_now=True)
     categories = models.ManyToManyField(Category, related_name='products')
     promotions = models.ManyToManyField(Promotion, blank=True)
+    rating_rv = models.FloatField(default=0)
+    rating_nb = models.PositiveIntegerField(default=0)
     image = models.ImageField(blank=True, null=True,upload_to='product_images/')
 
     def __str__(self) -> str:

@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'Store',
     'Favorites',
     'Reviews',
+    'ecom_backend',
+    'django_filters',
     'rest_framework.authtoken',
     'allauth',
     'allauth.account',
