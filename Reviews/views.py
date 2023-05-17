@@ -27,6 +27,7 @@ class ReviewCreateAPIView(generics.CreateAPIView):
         pk = self.kwargs.get('pk')
         productlist = Product.objects.get(pk=pk)
         review_user = self.request.user
+        print(review_user)
         review = Review.objects.filter(product=productlist,user=review_user)
         if review.exists():
             raise  ValidationError('you have already a review')
