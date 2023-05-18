@@ -1,13 +1,11 @@
 from django.db import models
 from django.conf import settings
 from Store.models import Product
-
-
-
+from core.models import *
 
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     content = models.TextField()
     rating = models.PositiveIntegerField()

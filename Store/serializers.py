@@ -17,14 +17,14 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'inventory',
-                  'unit_price', 'categories','categories_title','image']
+                  'unit_price', 'categories','categories_title','image','reviews']
 
 
 
 class SimpleProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['title', 'unit_price']
+        fields = ['name', 'unit_price']
 
 
 
@@ -118,7 +118,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItem
-        fields = ['product', 'unit_price', 'quantity']
+        fields = ['product', 'quantity','unit_price']
 
 
 
@@ -158,7 +158,7 @@ class CreateOrderSerializer(serializers.Serializer):
             cart_id = self.validated_data['cart_id']
 
             customer = CustomUser.objects.get(
-                user_id=self.context['user_id'])
+                id=self.context['customer_id'])
             order = Order.objects.create(customer=customer)
 
             cart_items = CartItem.objects \

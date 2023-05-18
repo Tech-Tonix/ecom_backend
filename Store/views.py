@@ -9,6 +9,7 @@ from rest_framework import generics
 import django_filters.rest_framework as  filters
 from rest_framework.filters import SearchFilter , OrderingFilter
 from .filter import *
+from rest_framework import permissions
 
 
 
@@ -64,7 +65,8 @@ class CartViewSet(CreateModelMixin,
                   RetrieveModelMixin,
                   DestroyModelMixin,
                   GenericViewSet):
-    queryset = Cart.objects.prefetch_related('items__product').all()
+    # permission_classes = [permissions.IsAuthenticated]
+    queryset = Cart.objects.prefetch_related('items', 'items__product').all()
     serializer_class = CartSerializer
 
 
@@ -101,7 +103,7 @@ class OrderViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = CreateOrderSerializer(
             data=request.data,
-            context={'user_id': self.request.user.id})
+            context={'customer_id': self.request.user.id})
         serializer.is_valid(raise_exception=True)
         order = serializer.save()
         serializer = OrderSerializer(order)
@@ -120,6 +122,14 @@ class OrderViewSet(ModelViewSet):
         if user.is_staff:
             return Order.objects.all()
 
-        customer_id = CustomUser.objects.only(
-            'id').get(user_id=user.id)
-        return Order.objects.filter(customer_id=customer_id)
+        # id = CustomUser.objects.only(
+        #     'id').get(customer_id=id)
+        # return Order.objects.filter(customer_id=id)
+        
+        id = self.request.GET.get('id')
+
+        if id is not None:
+          id = int(id)
+          return Order.objects.filter(customer_id=id)
+
+        return Order.objects.none()
