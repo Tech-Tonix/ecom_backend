@@ -15,4 +15,6 @@ router.register('orders', views.OrderViewSet, basename='orders')
 urlpatterns = router.urls +[
     path('add-cart/',views.AddToCartViewSet.as_view()),
     path('delete-cartitem/<int:id>/',views.CartItemViewSet.as_view({'delete':'destroy'})),
+    path('update-cartitem/<int:id>/',views.CartItemViewSet.as_view({'put':'update'})),
+
 ]

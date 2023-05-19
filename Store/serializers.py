@@ -46,18 +46,21 @@ class CategorySerializer(serializers.ModelSerializer):
 class CartItemSerializer(serializers.ModelSerializer):
     product = SimpleProductSerializer()
     total_product_price = serializers.SerializerMethodField()
-    # total_price = serializers.SerializerMethodField()
+    total_price = serializers.SerializerMethodField()
 
 
     def get_total_product_price(self, cart_item: CartItem):
         return cart_item.quantity * cart_item.product.unit_price
     
-    # def get_total_price(self, cart_item: CartItem):
-    #      return sum([item.quantity * item.product.unit_price for item in cart_item.items.all()])
 
     class Meta:
         model = CartItem
-        fields = ['product', 'quantity' ,'total_product_price']
+        fields = ['product', 'quantity' ,'total_product_price','total_price']
+
+    def get_total_price(self, cart_item:CartItem):
+        cart_items = CartItem.objects.filter(customer_id=cart_item.customer_id)
+        return sum(item.quantity * item.product.unit_price for item in cart_items)
+
     
     def update(self,instance, validated_data):
         instance.quantity = validated_data.get('quantity', instance.quantity)
@@ -115,10 +118,10 @@ class AddCartItemSerializer(serializers.ModelSerializer):
 
 
 
-class UpdateCartItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CartItem
-        fields = ['quantity']
+# class UpdateCartItemSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = CartItem
+#         fields = ['quantity']
 
 
 ################################################ORDERS############################################################

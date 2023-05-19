@@ -58,33 +58,23 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 
 
-
-
-
-# class CartViewSet(CreateModelMixin,
-#                   RetrieveModelMixin,
-#                   DestroyModelMixin,
-#                   GenericViewSet):
-#     permission_classes = [permissions.IsAuthenticated]
-#     queryset = Cart.objects.prefetch_related('items', 'items__product').all()
-#     serializer_class = CartItemSerializer
-
-
-
-
 class CartItemViewSet(ModelViewSet):
     serializer_class = CartItemSerializer
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['get', 'delete','patch']
-
-    # def get_serializer_class(self):
-    #     if self.request.method == 'POST':
-    #         return AddCartItemSerializer
-    #     elif self.request.method == 'PATCH':
-    #         return UpdateCartItemSerializer
-    #     return CartItemSerializer
-
+    http_method_names = ['get', 'delete','put']
     
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_staff:
+            return CartItem.objects.all()
+
+        if user.is_authenticated:
+            return CartItem.objects.filter(customer_id=user.id)
+        
+
+
+        
     def destroy(self, request, *args, **kwargs):
         user = self.request.user
 
@@ -99,18 +89,36 @@ class CartItemViewSet(ModelViewSet):
         cart_item= queryset.filter(product_id=product_id).first()
         cart_item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
 
+    
 
-
-    def get_queryset(self):
+    def update(self, request, *args, **kwargs):
         user = self.request.user
 
-        if user.is_staff:
-            return CartItem.objects.all()
+        queryset = CartItem.objects.filter(customer_id=user.id)
+        product_id = kwargs['id']
+        if not Product.objects.filter(id=product_id).exists():
+          return Response(
+            {'error': 'Associated product does not exist.'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+        cart_item = queryset.filter(product_id=product_id).first()
+        if cart_item is None:
+          return Response(
+            {'error': 'Associated product does not exist in the cart.'},
+            status=status.HTTP_404_NOT_FOUND
+        )
 
-        if user.is_authenticated:
-            return CartItem.objects.filter(customer_id=user.id)
+        serializer = self.get_serializer(cart_item, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
 
+    # Update the quantity
+        quantity = serializer.validated_data.get('quantity')
+        cart_item.quantity = quantity
+        cart_item.save()
+
+        return Response(serializer.data)
 
 
 
