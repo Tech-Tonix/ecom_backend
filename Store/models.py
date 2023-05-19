@@ -68,19 +68,21 @@ class OrderItem(models.Model):
 
 
 
-class Cart(models.Model):
-    # customer = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
-    id = models.UUIDField(primary_key=True, default=uuid4) 
-    #uuid4 is and identifier we use it to make a complicated id so the users carts are more secure because the don't need to login to make them
+class CartItem(models.Model):
+    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE) 
     created_at = models.DateTimeField(auto_now_add=True)
+    quantity = models.PositiveSmallIntegerField()
 
     def __str__(self):
         return str(self.id)
 
-class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE,related_name='items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveSmallIntegerField()
 
-    class Meta:
-        unique_together = [['cart', 'product']] # so when the user add the same item 2 times only the quantity becomes 2
+
+# class CartItem(models.Model):
+#     cart = models.ForeignKey(Cart, on_delete=models.CASCADE,related_name='items')
+#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+#     quantity = models.PositiveSmallIntegerField()
+
+#     class Meta:
+#         unique_together = [['cart', 'product']] # so when the user add the same item 2 times only the quantity becomes 2

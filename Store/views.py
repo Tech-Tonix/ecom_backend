@@ -61,37 +61,87 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 
 
-class CartViewSet(CreateModelMixin,
-                  RetrieveModelMixin,
-                  DestroyModelMixin,
-                  GenericViewSet):
-    # permission_classes = [permissions.IsAuthenticated]
-    queryset = Cart.objects.prefetch_related('items', 'items__product').all()
-    serializer_class = CartSerializer
+# class CartViewSet(CreateModelMixin,
+#                   RetrieveModelMixin,
+#                   DestroyModelMixin,
+#                   GenericViewSet):
+#     permission_classes = [permissions.IsAuthenticated]
+#     queryset = Cart.objects.prefetch_related('items', 'items__product').all()
+#     serializer_class = CartItemSerializer
 
 
 
 
 class CartItemViewSet(ModelViewSet):
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    serializer_class = CartItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get', 'delete','patch']
 
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return AddCartItemSerializer
-        elif self.request.method == 'PATCH':
-            return UpdateCartItemSerializer
-        return CartItemSerializer
+    # def get_serializer_class(self):
+    #     if self.request.method == 'POST':
+    #         return AddCartItemSerializer
+    #     elif self.request.method == 'PATCH':
+    #         return UpdateCartItemSerializer
+    #     return CartItemSerializer
 
-    def get_serializer_context(self):
-        return {'cart_id': self.kwargs['cart_pk']}
+    
+    def destroy(self, request, *args, **kwargs):
+        user = self.request.user
+
+        queryset = CartItem.objects.filter(customer_id=user.id)
+        
+        product_id = kwargs['id']
+        if not Product.objects.filter(id=product_id).exists():
+            return Response(
+                {'error': 'Associated product does not exist.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        cart_item= queryset.filter(product_id=product_id).first()
+        cart_item.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 
     def get_queryset(self):
-        return CartItem.objects \
-            .filter(cart_id=self.kwargs['cart_pk']) \
-            .select_related('product')
+        user = self.request.user
+
+        if user.is_staff:
+            return CartItem.objects.all()
+
+        if user.is_authenticated:
+            return CartItem.objects.filter(customer_id=user.id)
 
 
 
+
+class AddToCartViewSet(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = AddCartItemSerializer
+    queryset = CartItem.objects.all()
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        product = Product.objects.get(id=serializer.validated_data['product_id'])
+        quantity = serializer.validated_data['quantity']
+
+        user = request.user
+        cart_item , created = CartItem.objects.get_or_create(
+            customer=user,
+            product=product,
+            defaults={'quantity':quantity}
+        )
+
+        if not created:
+            cart_item.quantity +=quantity
+            cart_item.save()
+        
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
+
+#######################################################################################################################
 class OrderViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
 
