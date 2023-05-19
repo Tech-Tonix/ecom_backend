@@ -77,12 +77,3 @@ class CartItem(models.Model):
     def __str__(self):
         return str(self.id)
 
-
-
-# class CartItem(models.Model):
-#     cart = models.ForeignKey(Cart, on_delete=models.CASCADE,related_name='items')
-#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-#     quantity = models.PositiveSmallIntegerField()
-
-#     class Meta:
-#         unique_together = [['cart', 'product']] # so when the user add the same item 2 times only the quantity becomes 2

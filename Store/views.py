@@ -126,7 +126,16 @@ class AddToCartViewSet(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = AddCartItemSerializer
     queryset = CartItem.objects.all()
+
     def create(self, request, *args, **kwargs):
+        user = self.request.user
+        product_id = kwargs['id']
+        if not Product.objects.filter(id=product_id).exists():
+         return Response(
+            {'error': 'Associated product does not exist.'},
+            status=status.HTTP_404_NOT_FOUND
+            )
+        
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -149,14 +158,16 @@ class AddToCartViewSet(generics.CreateAPIView):
 
 
 
-#######################################################################################################################
+###########################################################ORDER############################################################
 class OrderViewSet(ModelViewSet):
-    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = OrderSerializer
+    http_method_names = ['get', 'post', 'delete']
 
-    def get_permissions(self): 
-        if self.request.method in ['PATCH', 'DELETE']: #only the admin can update or delete the order
-            return [IsAdminUser()]
-        return [IsAuthenticated()]
+    # def get_permissions(self): 
+    #     if self.request.method in ['PATCH', 'DELETE']: #only the admin can update or delete the order
+    #         return [IsAdminUser()]
+    #     return [IsAuthenticated()]
 
     def create(self, request, *args, **kwargs):
         serializer = CreateOrderSerializer(
@@ -167,12 +178,12 @@ class OrderViewSet(ModelViewSet):
         serializer = OrderSerializer(order)
         return Response(serializer.data)
 
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return CreateOrderSerializer
-        elif self.request.method == 'PATCH':
-            return UpdateOrderSerializer
-        return OrderSerializer
+    # def get_serializer_class(self):
+    #     if self.request.method == 'POST':
+    #         return CreateOrderSerializer
+    #     elif self.request.method == 'PATCH':
+    #         return UpdateOrderSerializer
+    #     return OrderSerializer
 
     def get_queryset(self):
         user = self.request.user

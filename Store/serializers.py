@@ -34,7 +34,6 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['id', 'title', 'products']
 
-    # products_count = serializers.IntegerField(read_only=True)
 
 
 
@@ -70,16 +69,6 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 
 
-# class CartSerializer(serializers.ModelSerializer):
-#     items = CartItemSerializer(many=True, read_only=True)
-#     total_price = serializers.SerializerMethodField()
-
-#     def get_total_price(self, cart):
-#         return sum([item.quantity * item.product.unit_price for item in cart.items.all()])
-
-#     class Meta:
-#         model = Cart
-#         fields = ['items', 'total_price']
 
 
 
@@ -87,29 +76,6 @@ class AddCartItemSerializer(serializers.ModelSerializer):
     product_id = serializers.IntegerField()
     quantity = serializers.IntegerField(min_value=1)
 
-    # def validate_product_id(self, value):
-    #     if not Product.objects.filter(pk=value).exists():
-    #         raise serializers.ValidationError(
-    #             'No product with the given ID was found.')
-    #     return value
-
-    # def save(self, **kwargs):
-    #     customer_id=self.validated_data['customer_id']
-    #     cart_id = self.context['cart_id']
-    #     product_id = self.validated_data['product_id']
-    #     quantity = self.validated_data['quantity']
-
-    #     try:
-    #         cart_item = CartItem.objects.get(
-    #             customer_id=customer_id,cart_id=cart_id, product_id=product_id)
-    #         cart_item.quantity += quantity
-    #         cart_item.save()
-    #         self.instance = cart_item
-    #     except CartItem.DoesNotExist:
-    #         self.instance = CartItem.objects.create(
-    #             cart_id=cart_id, **self.validated_data)
-
-    #     return self.instance
 
     class Meta:
         model = CartItem
@@ -117,11 +83,6 @@ class AddCartItemSerializer(serializers.ModelSerializer):
 
 
 
-
-# class UpdateCartItemSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = CartItem
-#         fields = ['quantity']
 
 
 ################################################ORDERS############################################################
@@ -145,21 +106,18 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 
-class UpdateOrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = ['payment_status']
-
+# class UpdateOrderSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Order
+#         fields = ['payment_status']
 
 
 
 
 class CreateOrderSerializer(serializers.Serializer):
-    cart_id = serializers.UUIDField()
-
 
     def validate_cart_id(self, cart_id): #test if the cart is empty oe deleted and raise validation error
-        if not Cart.objects.filter(pk=cart_id).exists():
+        if not CartItem.objects.filter(cart_id=cart_id).exists():
             raise serializers.ValidationError(
                 'No cart with the given ID was found.')
         if CartItem.objects.filter(cart_id=cart_id).count() == 0:
@@ -187,8 +145,6 @@ class CreateOrderSerializer(serializers.Serializer):
             ]
             OrderItem.objects.bulk_create(order_items)
 
-            Cart.objects.filter(pk=cart_id).delete()
-
-            # order_created.send_robust(self.__class__, order=order)
+            CartItem.objects.filter(cart_id=cart_id).delete()
 
             return order
