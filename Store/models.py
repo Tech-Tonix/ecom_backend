@@ -40,34 +40,6 @@ class Product(models.Model):
         return self.name
     
 
-
-
-class Order(models.Model):
-    PAYMENT_STATUS_PENDING = 'P'
-    PAYMENT_STATUS_COMPLETE = 'C'
-    PAYMENT_STATUS_FAILED = 'F'
-    PAYMENT_STATUS_CHOICES = [
-        (PAYMENT_STATUS_PENDING, 'Pending'),
-        (PAYMENT_STATUS_COMPLETE, 'Complete'),
-        (PAYMENT_STATUS_FAILED, 'Failed')
-    ]
-
-    placed_at = models.DateTimeField(auto_now_add=True)
-    payment_status = models.CharField(
-        max_length=1, choices=PAYMENT_STATUS_CHOICES, default=PAYMENT_STATUS_PENDING)
-    customer = models.ForeignKey(CustomUser, on_delete=models.PROTECT)
-
-
-
-
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.PROTECT,related_name='items')
-    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='orderitems')
-    quantity = models.PositiveSmallIntegerField()
-    unit_price = models.DecimalField(max_digits=6, decimal_places=2)
-
-
-
 class CartItem(models.Model):
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE) 
@@ -76,4 +48,28 @@ class CartItem(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+
+class Order(models.Model):
+    STATUS_PENDING = 'P'
+    STATUS_COMPLETE = 'C'
+    STATUS_FAILED = 'F'
+    STATUS_CHOICES = [
+        (STATUS_PENDING, 'Pending'),
+        (STATUS_COMPLETE, 'Complete'),
+        (STATUS_FAILED, 'Failed')
+    ]
+
+    placed_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=1, choices=STATUS_CHOICES, default=STATUS_PENDING)
+    customer = models.ForeignKey(CustomUser, on_delete=models.PROTECT)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.PROTECT)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='item')
+
 

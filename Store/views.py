@@ -10,6 +10,7 @@ import django_filters.rest_framework as  filters
 from rest_framework.filters import SearchFilter , OrderingFilter
 from .filter import *
 from rest_framework import permissions
+from .permissions import CanModifyOrder
 
 
 
@@ -22,7 +23,7 @@ class ProductsViewSet(viewsets.ModelViewSet):
     search_fields = ['name','unit_price','categories__title','promotions__discount']
     order_fields = ['name','unit_price','promotions__discount','inventory']
     def get_permissions(self): 
-        if self.request.method in ['PATCH', 'DELETE','POST','PUT']: #only the admin can update or delete the order
+        if self.request.method in ['PATCH', 'DELETE','POST','PUT']: #only the admin can update or delete the product
             return [IsAdminUser()]
         return []
 
@@ -129,7 +130,8 @@ class AddToCartViewSet(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         user = self.request.user
-        product_id = kwargs['id']
+        # product_id = kwargs['id']
+        product_id = request.data.get('product_id')
         if not Product.objects.filter(id=product_id).exists():
          return Response(
             {'error': 'Associated product does not exist.'},
@@ -159,46 +161,106 @@ class AddToCartViewSet(generics.CreateAPIView):
 
 
 ###########################################################ORDER############################################################
-class OrderViewSet(ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+class OrderViewSet(viewsets.ViewSet):
     serializer_class = OrderSerializer
-    http_method_names = ['get', 'post', 'delete']
+    permission_classes = [IsAuthenticated, CanModifyOrder]
+    http_method_names = ['post', 'get']
 
-    # def get_permissions(self): 
-    #     if self.request.method in ['PATCH', 'DELETE']: #only the admin can update or delete the order
-    #         return [IsAdminUser()]
-    #     return [IsAuthenticated()]
-
-    def create(self, request, *args, **kwargs):
-        serializer = CreateOrderSerializer(
-            data=request.data,
-            context={'customer_id': self.request.user.id})
-        serializer.is_valid(raise_exception=True)
-        order = serializer.save()
-        serializer = OrderSerializer(order)
-        return Response(serializer.data)
-
-    # def get_serializer_class(self):
-    #     if self.request.method == 'POST':
-    #         return CreateOrderSerializer
-    #     elif self.request.method == 'PATCH':
-    #         return UpdateOrderSerializer
-    #     return OrderSerializer
-
-    def get_queryset(self):
+    def create(self, request,*args, **kwargs):
         user = self.request.user
+        cart_items = CartItem.objects.filter(customer=user)
 
-        if user.is_staff:
-            return Order.objects.all()
+        if not cart_items.exists():
+            return Response(
+                {'error': 'No items found in the cart.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        # id = CustomUser.objects.only(
-        #     'id').get(customer_id=id)
-        # return Order.objects.filter(customer_id=id)
+        total_amount = sum(item.product.unit_price * item.quantity for item in cart_items)
+
+        order = Order.objects.create(
+            customer=user,
+            total_amount=total_amount,
+        )
+
+
+        for cart_item in cart_items:
+            OrderItem.objects.create(
+                order=order,
+                product=cart_item.product,
+            )
+
+        # Delete the cart items
+        cart_items.delete()
+
+        serializer = OrderSerializer(order)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+# class OrderViewSet(ModelViewSet):
+#     permission_classes = [permissions.IsAuthenticated]
+#     serializer_class = CreateOrderSerializer
+#     http_method_names = ['get','delete','put']
+
+#     def get_permissions(self): 
+#         if self.request.method in ['Put', 'DELETE']: 
+#             return [IsOrderPending()]
+#         return [IsAuthenticated()]
+
+
+#     def get_queryset(self):
+#         user = self.request.user
+
+#         if user.is_staff:
+#             return Order.objects.all()
         
-        id = self.request.GET.get('id')
+#         id = self.request.GET.get('id')
 
-        if id is not None:
-          id = int(id)
-          return Order.objects.filter(customer_id=id)
+#         if id is not None:
+#           id = int(id)
+#           return Order.objects.filter(customer_id=id)
 
-        return Order.objects.none()
+#         return Order.objects.none()
+
+    # def create(self, request, *args, **kwargs):
+    #     serializer = CreateOrderSerializer(
+    #         data=request.data,
+    #         context={'customer_id': self.request.user.id})
+    #     serializer.is_valid(raise_exception=True)
+    #     order = serializer.save()
+    #     serializer = OrderSerializer(order)
+    #     return Response(serializer.data)
+
+ 
+
+# class OrderCreateAPIView(generics.CreateAPIView):
+#     permission_classes = [permissions.IsAuthenticated]
+#     serializer_class = CreateOrderSerializer
+#     queryset = CartItem.objects.all()
+
+#     def create(self, request, *args, **kwargs):
+#         user = self.request.user
+#         product_id = kwargs['id']
+#         if not Product.objects.filter(id=product_id).exists():
+#          return Response(
+#             {'error': 'Associated product does not exist.'},
+#             status=status.HTTP_404_NOT_FOUND
+#             )
+        
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+
+#         product = Product.objects.get(id=serializer.validated_data['product_id'])
+#         quantity = serializer.validated_data['quantity']
+
+#         user = request.user
+#         cart_item , created = CartItem.objects.get_or_create(
+#             customer=user,
+#             product=product,
+#             defaults={'quantity':quantity}
+#         )
+
+#         if not created:
+#             cart_item.quantity +=quantity
+#             cart_item.save()
+        
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
