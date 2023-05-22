@@ -28,6 +28,15 @@ class FavoritesViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+    def retrieve(self, request,):
+        user = self.request.user
+        queryset = self.get_queryset()
+        favorite = Favorites.objects.filter(customer_id=user.id)
+        favorite_items = favorite.FavoriteItems.all()  # Retrieve all favorite items of the favorite
+        serializer = FavoritesItemSerializer(favorite_items, many=True)  # Serialize the favorite items
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
     def destroy(self, request, *args, **kwargs):
         user = self.request.user
         favoriteItem_id = kwargs['id']

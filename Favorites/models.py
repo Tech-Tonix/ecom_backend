@@ -10,5 +10,5 @@ class Favorites(models.Model):
 
 
 class FavoritesItem(models.Model):
-    Favorites = models.ForeignKey(Favorites, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE,related_name='FavoriteItems')
+    favorites = models.ForeignKey(Favorites, on_delete=models.CASCADE,related_name='favorite_items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,related_name='favorite_items')

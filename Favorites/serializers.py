@@ -9,8 +9,9 @@ class FavoritesItemSerializer(serializers.ModelSerializer):
 
 
 class FavoritesSerializer(serializers.ModelSerializer):
-    FavoriteItems = FavoritesItemSerializer(many=True,read_only=True)
+    favorite_items = FavoritesItemSerializer(many=True,read_only=True)
 
     class Meta :
         model = Favorites
-        fields= ('customer','FavoriteItems',)
+        fields= ('customer','favorite_items')
+    

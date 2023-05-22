@@ -90,8 +90,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     item = OrderItemSerializer(many=True, read_only=True)
-    # status = Order
+    quantity = OrderItemSerializer()
 
     class Meta:
         model = Order
-        fields = ('customer', 'item' ,'total_amount','placed_at','status')
+        fields = ('customer', 'item' ,'quantity','total_amount','placed_at','status')
