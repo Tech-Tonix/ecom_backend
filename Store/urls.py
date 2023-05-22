@@ -9,13 +9,12 @@ router.register('products', views.ProductsViewSet, basename='products')
 router.register('Categories', views.CategoryViewSet)
 router.register('orders', views.OrderViewSet, basename='orders')
 
-# carts_router = routers.NestedDefaultRouter(router, 'carts', lookup='cart')
-# carts_router.register('items', views.CartItemViewSet, basename='cart-items')
-
 urlpatterns = router.urls +[
     path('add-cart/',views.AddToCartViewSet.as_view()),
     path('delete-cartitem/<int:id>/',views.CartItemViewSet.as_view({'delete':'destroy'})),
     path('update-cartitem/<int:id>/',views.CartItemViewSet.as_view({'put':'update'})),
     path('orders/delete/<int:id>/', views.OrderViewSet.as_view({'delete':'destroy'})),
+    path('orders/update/<int:order_id>/<int:order_item_id>/', views.OrderViewSet.as_view({'put': 'update'})),
+    path('orders/delete-orderitem/<int:order_id>/<int:order_item_id>/', views.OrderItemViewset.as_view({'delete': 'destroy'})),
 
 ]

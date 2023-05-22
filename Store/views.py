@@ -12,6 +12,7 @@ from .filter import *
 from rest_framework import permissions
 from .permissions import CanModifyOrder
 from datetime import timedelta, datetime , timezone
+from .utils import recalculate_order_total
 
 
 
@@ -44,7 +45,7 @@ class ProductDetail(viewsets.ModelViewSet):
     lookup_field = 'id'
 
 
-
+#######################################################################################################################
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
@@ -58,7 +59,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
     
 
-
+#####################################################################################################################
 
 class CartItemViewSet(ModelViewSet):
     serializer_class = CartItemSerializer
@@ -162,6 +163,7 @@ class AddToCartViewSet(generics.CreateAPIView):
 
 
 ###########################################################ORDER############################################################
+
 class OrderViewSet(viewsets.ViewSet):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated, CanModifyOrder]
@@ -210,6 +212,7 @@ class OrderViewSet(viewsets.ViewSet):
             OrderItem.objects.create(
                 order=order,
                 product=cart_item.product,
+                quantity=cart_item.quantity,
             )
 
         cart_items.delete()
@@ -247,14 +250,100 @@ class OrderViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
 
-    # def update(self, request, *args, **kwargs):
-    #     user = self.request.user
 
-    #     queryset = Order.objects.filter(customer_id=user.id)
-    #     product_id = kwargs['id']
-    #     if not Product.objects.filter(id=product_id).exists():
-    #       return Response(
-    #         {'error': 'Associated product does not exist.'},
-    #         status=status.HTTP_404_NOT_FOUND
-    #     )
+
+    def update(self, request, *args, **kwargs):
+
+        order_id = kwargs['order_id']
+        order = Order.objects.get(id=order_id)
+
+        try:
+            order_item_id = kwargs['order_item_id']
+            order_item = OrderItem.objects.get(id=order_item_id, order_id=order_id)
+
+
+        except (KeyError, OrderItem.DoesNotExist):
+             return Response(
+                {'error': 'Order item not found.'},
+                status=status.HTTP_404_NOT_FOUND
+             )
+        
+        current_time = datetime.now(timezone.utc)
+
+        time_difference = current_time - order.placed_at
+
+        if time_difference > timedelta(hours=24):
+            return Response(
+                {'error': 'The deletion window for this order has expired.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        quantity = request.data.get('quantity')
+        
+        if quantity is None:
+              return Response(
+                 {'error': 'Quantity parameter is required.'},
+                 status=status.HTTP_400_BAD_REQUEST
+                 )
+        try:
+             quantity = int(quantity)
+             if quantity < 0:
+               return Response(
+                  {'error': 'Quantity must be a non-negative integer.'},
+                  status=status.HTTP_400_BAD_REQUEST
+              )
+         
+             
+        except ValueError:
+              return Response(
+               {'error': 'Invalid quantity value.'},
+               status=status.HTTP_400_BAD_REQUEST
+              )
+
+
+        order_item.quantity= quantity
+        order_item.save()
+
+        recalculate_order_total(order)
+
+        serializer = OrderSerializer(order_item.order)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+class OrderItemViewset(viewsets.ViewSet):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated, CanModifyOrder]
+    http_method_names = ['delete']
+
+    def destroy(self, request, *args, **kwargs):
+    
+        order_id = kwargs['order_id']
+        order = Order.objects.get(id=order_id)
+
+        try:
+            order_item_id = kwargs['order_item_id']
+            order_item = OrderItem.objects.get(id=order_item_id, order_id=order_id)
+
+
+        except (KeyError, OrderItem.DoesNotExist):
+             return Response(
+                {'error': 'Order item not found.'},
+                status=status.HTTP_404_NOT_FOUND
+             )
+        current_time = datetime.now(timezone.utc)
+
+        time_difference = current_time - order.placed_at
+
+        if time_difference > timedelta(hours=24):
+            return Response(
+                {'error': 'The deletion window for this order has expired.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+      
+        order_item.delete()
+        recalculate_order_total(order)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
