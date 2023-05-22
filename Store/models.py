@@ -64,12 +64,16 @@ class Order(models.Model):
     placed_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
         max_length=1, choices=STATUS_CHOICES, default=STATUS_PENDING)
-    customer = models.ForeignKey(CustomUser, on_delete=models.PROTECT)
+    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
 
+    def __str__(self):
+        return str(self.id)
+
+
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.PROTECT)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='item')
 
 

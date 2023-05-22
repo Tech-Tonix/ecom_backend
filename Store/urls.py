@@ -16,6 +16,6 @@ urlpatterns = router.urls +[
     path('add-cart/',views.AddToCartViewSet.as_view()),
     path('delete-cartitem/<int:id>/',views.CartItemViewSet.as_view({'delete':'destroy'})),
     path('update-cartitem/<int:id>/',views.CartItemViewSet.as_view({'put':'update'})),
-    # path('orders/create/', views.Or.as_view(), name='order-create'),
+    path('orders/delete/<int:id>/', views.OrderViewSet.as_view({'delete':'destroy'})),
 
 ]

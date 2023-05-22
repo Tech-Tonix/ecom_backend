@@ -11,6 +11,7 @@ from rest_framework.filters import SearchFilter , OrderingFilter
 from .filter import *
 from rest_framework import permissions
 from .permissions import CanModifyOrder
+from datetime import timedelta, datetime , timezone
 
 
 
@@ -164,7 +165,28 @@ class AddToCartViewSet(generics.CreateAPIView):
 class OrderViewSet(viewsets.ViewSet):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated, CanModifyOrder]
-    http_method_names = ['post', 'get']
+    http_method_names = ['post', 'get','put','delete']
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_staff:
+            return Order.objects.all()
+
+        if user.is_authenticated:
+            return Order.objects.filter(customer_id=user.id)
+
+   
+        
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    
+    
 
     def create(self, request,*args, **kwargs):
         user = self.request.user
@@ -190,77 +212,49 @@ class OrderViewSet(viewsets.ViewSet):
                 product=cart_item.product,
             )
 
-        # Delete the cart items
         cart_items.delete()
 
         serializer = OrderSerializer(order)
+
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-# class OrderViewSet(ModelViewSet):
-#     permission_classes = [permissions.IsAuthenticated]
-#     serializer_class = CreateOrderSerializer
-#     http_method_names = ['get','delete','put']
-
-#     def get_permissions(self): 
-#         if self.request.method in ['Put', 'DELETE']: 
-#             return [IsOrderPending()]
-#         return [IsAuthenticated()]
 
 
-#     def get_queryset(self):
-#         user = self.request.user
+    def destroy(self, request, *args, **kwargs):
 
-#         if user.is_staff:
-#             return Order.objects.all()
+        order_id = kwargs['id']
+
+        order=Order.objects.get(id=order_id)
+
+        if not Order.objects.filter(id=order_id).exists():
+            return Response(
+                {'error': 'Order not found.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        current_time = datetime.now(timezone.utc)
+
+        time_difference = current_time - order.placed_at
+
+        if time_difference > timedelta(hours=24):
+            return Response(
+                {'error': 'The deletion window for this order has expired.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
         
-#         id = self.request.GET.get('id')
+        order.delete()
 
-#         if id is not None:
-#           id = int(id)
-#           return Order.objects.filter(customer_id=id)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 
-#         return Order.objects.none()
+    # def update(self, request, *args, **kwargs):
+    #     user = self.request.user
 
-    # def create(self, request, *args, **kwargs):
-    #     serializer = CreateOrderSerializer(
-    #         data=request.data,
-    #         context={'customer_id': self.request.user.id})
-    #     serializer.is_valid(raise_exception=True)
-    #     order = serializer.save()
-    #     serializer = OrderSerializer(order)
-    #     return Response(serializer.data)
+    #     queryset = Order.objects.filter(customer_id=user.id)
+    #     product_id = kwargs['id']
+    #     if not Product.objects.filter(id=product_id).exists():
+    #       return Response(
+    #         {'error': 'Associated product does not exist.'},
+    #         status=status.HTTP_404_NOT_FOUND
+    #     )
 
- 
-
-# class OrderCreateAPIView(generics.CreateAPIView):
-#     permission_classes = [permissions.IsAuthenticated]
-#     serializer_class = CreateOrderSerializer
-#     queryset = CartItem.objects.all()
-
-#     def create(self, request, *args, **kwargs):
-#         user = self.request.user
-#         product_id = kwargs['id']
-#         if not Product.objects.filter(id=product_id).exists():
-#          return Response(
-#             {'error': 'Associated product does not exist.'},
-#             status=status.HTTP_404_NOT_FOUND
-#             )
-        
-#         serializer = self.get_serializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-
-#         product = Product.objects.get(id=serializer.validated_data['product_id'])
-#         quantity = serializer.validated_data['quantity']
-
-#         user = request.user
-#         cart_item , created = CartItem.objects.get_or_create(
-#             customer=user,
-#             product=product,
-#             defaults={'quantity':quantity}
-#         )
-
-#         if not created:
-#             cart_item.quantity +=quantity
-#             cart_item.save()
-        
-#         return Response(serializer.data, status=status.HTTP_201_CREATED)
