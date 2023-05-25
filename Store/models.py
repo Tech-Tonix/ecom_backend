@@ -47,7 +47,7 @@ class CartItem(models.Model):
     quantity = models.PositiveSmallIntegerField()
 
     def __str__(self):
-        return str(self.id)
+          return f"Cart-item ID: {self.id} - Customer: {self.customer.email}"
 
 
 
@@ -69,12 +69,16 @@ class Order(models.Model):
 
 
     def __str__(self):
-        return str(self.id)
+      return f"Order ID: {self.id} - Customer: {self.customer.email}"
 
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE,related_name='item')
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='item')
     quantity = models.PositiveSmallIntegerField()
+
+
+    def __str__(self):
+        return f"Order-item ID: {self.id} - Customer: {self.order.customer.email}"
 
 
