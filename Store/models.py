@@ -35,17 +35,13 @@ class Product(models.Model):
     rating_rv = models.FloatField(default=0)
     rating_nb = models.PositiveIntegerField(default=0)
     image = models.ImageField(blank=True, null=True,upload_to='product_images/')
+    size = models.CharField(max_length=10,null=True, blank=True)
+    color = models.CharField(max_length=20,null=True, blank=True)
 
     def __str__(self) -> str:
         return self.name
 
 
-class Clothes(Product):
-    size = models.CharField(max_length=10)
-    color = models.CharField(max_length=20)
-
-    def __str__(self):
-        return f"{self.name} - Size: {self.size}, Color: {self.color}"
 
 
 

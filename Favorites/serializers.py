@@ -1,17 +1,18 @@
-from .models import Favorites, FavoritesItem
+from .models import  FavoritesItem
 from rest_framework import serializers
+from Store.serializers import SimpleProductSerializer
 
 
 class FavoritesItemSerializer(serializers.ModelSerializer):
+    product = SimpleProductSerializer()
     class Meta:
         model = FavoritesItem
-        fields=('product',)
+        fields=('product','customer')
 
-
-class FavoritesSerializer(serializers.ModelSerializer):
-    favorite_items = FavoritesItemSerializer(many=True,read_only=True)
-
-    class Meta :
-        model = Favorites
-        fields= ('customer','favorite_items')
     
+class AddFavoriteItemSerializer(serializers.ModelSerializer):
+    product_id = serializers.IntegerField()
+
+    class Meta:
+        model = FavoritesItem
+        fields = ('product_id',)

@@ -1,4 +1,4 @@
-from .models import  Category, Product, CartItem  , Order , OrderItem, Clothes
+from .models import  Category, Product, CartItem  , Order , OrderItem
 from rest_framework import serializers
 from core.models import CustomUser
 from django.db import transaction
@@ -17,11 +17,11 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 
-class ClothesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Clothes
-        fields = ['id', 'name', 'description','size','color', 
-                   'unit_price', 'categories','categories_title','image','reviews']
+# class ClothesSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Clothes
+#         fields = ['id', 'name', 'description','size','color', 
+#                    'unit_price', 'categories','categories_title','image','reviews']
         
 
 class SimpleProductSerializer(serializers.ModelSerializer):
