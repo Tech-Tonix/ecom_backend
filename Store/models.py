@@ -38,7 +38,16 @@ class Product(models.Model):
 
     def __str__(self) -> str:
         return self.name
-    
+
+
+class Clothes(Product):
+    size = models.CharField(max_length=10)
+    color = models.CharField(max_length=20)
+
+    def __str__(self):
+        return f"{self.name} - Size: {self.size}, Color: {self.color}"
+
+
 
 class CartItem(models.Model):
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
