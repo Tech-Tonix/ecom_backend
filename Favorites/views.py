@@ -5,8 +5,13 @@ from rest_framework.permissions import IsAdminUser , IsAuthenticated
 from rest_framework.response import Response
 from Store.models import Product
 from rest_framework import generics
+from Store.serializers import SimpleProductSerializer
+from rest_framework import mixins, viewsets
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
-class FavoritesViewSet(viewsets.ViewSet):
+
+
+class FavoritesViewSet(ModelViewSet):
     serializer_class = FavoritesItemSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'delete']
