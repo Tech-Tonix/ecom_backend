@@ -1,19 +1,26 @@
-from .models import  Category, Product, CartItem  , Order , OrderItem
+from .models import  Category, Product, CartItem  , Order , OrderItem,ProductImage
 from rest_framework import serializers
 from core.models import CustomUser
 from django.db import transaction
 from Reviews.serializers import *
 
 
+class ProductPhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ('id', 'image')
+
+
 
 class ProductSerializer(serializers.ModelSerializer):
     categories_title= serializers.CharField(source = 'categories.title',read_only = True)
     reviews = ReviewSerializer(many=True,read_only = True)
+    images = ProductPhotoSerializer(many=True, read_only=True)
     
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description','color','size',
-                  'unit_price', 'categories','categories_title','image','reviews']
+        fields = ['id', 'name', 'description','color','size','images',
+                  'unit_price', 'categories','categories_title','reviews']
 
 
 

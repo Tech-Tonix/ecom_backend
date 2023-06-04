@@ -17,7 +17,7 @@ class Category(models.Model):
     # featured_products = models.ManyToManyField(
     #     'Product', null=True, related_name='+', blank=True)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.title
     
 
@@ -34,13 +34,19 @@ class Product(models.Model):
     promotions = models.ManyToManyField(Promotion, blank=True)
     rating_rv = models.FloatField(default=0)
     rating_nb = models.PositiveIntegerField(default=0)
-    image = models.ImageField(blank=True, null=True,upload_to='product_images/')
+    # image = models.ImageField(blank=True, null=True,upload_to='product_images/')
     size = models.CharField(max_length=10,null=True, blank=True)
     color = models.CharField(max_length=20,null=True, blank=True)
 
-    def __str__(self) -> str:
+    def __str__(self) :
         return self.name
 
+
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField( null=True, blank=True, upload_to = 'product_images/')
 
 
 
