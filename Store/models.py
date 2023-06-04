@@ -64,12 +64,14 @@ class CartItem(models.Model):
 
 class Order(models.Model):
     STATUS_PENDING = 'P'
-    STATUS_COMPLETE = 'C'
-    STATUS_FAILED = 'F'
+    STATUS_PACKED = 'A'
+    STATUS_SHIPPED = 'S'
+    STATUS_DELIVERED = 'D'
     STATUS_CHOICES = [
         (STATUS_PENDING, 'Pending'),
-        (STATUS_COMPLETE, 'Complete'),
-        (STATUS_FAILED, 'Failed')
+        (STATUS_PACKED, 'Packed'),
+        (STATUS_SHIPPED,'Shipped'),
+        (STATUS_DELIVERED, 'Delivered')
     ]
 
     placed_at = models.DateTimeField(auto_now_add=True)

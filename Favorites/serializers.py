@@ -7,7 +7,7 @@ class FavoritesItemSerializer(serializers.ModelSerializer):
     product = SimpleProductSerializer(read_only = True)
     class Meta:
         model = FavoritesItem
-        fields=['product', 'customer',]
+        fields=['product', 'customer','quantity']
 
    
 
@@ -17,4 +17,4 @@ class AddFavoriteItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FavoritesItem
-        fields = ('product_id',)
+        fields = ('product_id','quantity')

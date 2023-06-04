@@ -108,14 +108,16 @@ class AddFavoriteViewSet(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
 
         product = Product.objects.get(id=serializer.validated_data['product_id'])
-
+        quantity = serializer.validated_data['quantity']
         user = request.user
         favorite_item , created = FavoritesItem.objects.get_or_create(
             customer=user,
             product=product,
+            defaults={'quantity':quantity}
         )
 
         if not created:
+            favorite_item.quantity +=quantity
             favorite_item.save()
         
         return Response(serializer.data, status=status.HTTP_201_CREATED)
