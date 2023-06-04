@@ -12,7 +12,8 @@ from .filter import *
 from rest_framework import permissions
 from .permissions import CanModifyOrder
 from datetime import timedelta, datetime , timezone
-from .utils import recalculate_order_total
+from .utils import recalculate_order_total , remove_quantity_from_inventory , update_quantity_from_inventory
+from django.db import transaction
 
 
 
@@ -204,13 +205,12 @@ class OrderViewSet(viewsets.ViewSet):
     def create(self, request,*args, **kwargs):
         user = self.request.user
         cart_items = CartItem.objects.filter(customer=user)
-
+ 
         if not cart_items.exists():
             return Response(
                 {'error': 'No items found in the cart.'},
                 status=status.HTTP_400_BAD_REQUEST
-            )
-
+            )      
         total_amount = sum(item.product.unit_price * item.quantity for item in cart_items)
 
         order = Order.objects.create(
@@ -218,15 +218,16 @@ class OrderViewSet(viewsets.ViewSet):
             total_amount=total_amount,
         )
 
-
-        for cart_item in cart_items:
+        with transaction.atomic():
+         for cart_item in cart_items:
+            remove_quantity_from_inventory(cart_item) 
             OrderItem.objects.create(
                 order=order,
                 product=cart_item.product,
                 quantity=cart_item.quantity,
             )
 
-        cart_items.delete()
+         cart_items.delete()
 
         serializer = OrderSerializer(order)
 
@@ -310,9 +311,10 @@ class OrderViewSet(viewsets.ViewSet):
                {'error': 'Invalid quantity value.'},
                status=status.HTTP_400_BAD_REQUEST
               )
-
-
+        update_quantity_from_inventory(order_item,quantity)
+        
         order_item.quantity= quantity
+
         order_item.save()
 
         recalculate_order_total(order)
