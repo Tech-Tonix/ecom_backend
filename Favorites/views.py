@@ -14,7 +14,7 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 class FavoritesViewSet(ModelViewSet):
     serializer_class = FavoritesItemSerializer
     permission_classes = [IsAuthenticated]
-    http_method_names = ['get', 'delete']
+    http_method_names = ['get', 'delete','put']
     
     def get_queryset(self):
         user = self.request.user
@@ -42,8 +42,36 @@ class FavoritesViewSet(ModelViewSet):
         favorite_item= queryset.filter(product_id=product_id).first()
         favorite_item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
 
+
+
+
+    def update(self, request, *args, **kwargs):
+        user = self.request.user
+
+        queryset = FavoritesItem.objects.filter(customer_id=user.id)
+        product_id = kwargs['id']
+        if not Product.objects.filter(id=product_id).exists():
+          return Response(
+            {'error': 'Associated product does not exist.'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+        favorite_item = queryset.filter(product_id=product_id).first()
+        if favorite_item is None:
+          return Response(
+            {'error': 'Associated product does not exist in the cart.'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+        serializer = self.get_serializer(favorite_item, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        quantity = serializer.validated_data.get('quantity')
+        favorite_item.quantity = quantity
+        favorite_item.save()
+
+        return Response(serializer.data)
+    
     # serializer_class = FavoritesSerializer
     # permission_classes=[IsAuthenticated]
     # http_method_names = ['get','delete']
