@@ -220,7 +220,7 @@ class OrderViewSet(viewsets.ViewSet):
 
         with transaction.atomic():
          for cart_item in cart_items:
-            remove_quantity_from_inventory(cart_item) 
+            # remove_quantity_from_inventory(cart_item) 
             OrderItem.objects.create(
                 order=order,
                 product=cart_item.product,
@@ -311,7 +311,7 @@ class OrderViewSet(viewsets.ViewSet):
                {'error': 'Invalid quantity value.'},
                status=status.HTTP_400_BAD_REQUEST
               )
-        update_quantity_from_inventory(order_item,quantity)
+        # update_quantity_from_inventory(order_item,quantity)
         
         order_item.quantity= quantity
 

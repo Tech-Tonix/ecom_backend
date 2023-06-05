@@ -101,12 +101,11 @@ class AddCartItemSerializer(serializers.ModelSerializer):
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        fields = ('item','quantity')
+        fields = ('product','quantity')
 
 class OrderSerializer(serializers.ModelSerializer):
-    item = OrderItemSerializer(many=True, read_only=True)
-    quantity = OrderItemSerializer()
+    items = OrderItemSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
-        fields = ('customer', 'item' ,'quantity','total_amount','placed_at','status')
+        fields = ('customer', 'items' ,'total_amount','placed_at','status')
