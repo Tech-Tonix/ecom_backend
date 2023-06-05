@@ -10,7 +10,9 @@ import django_filters.rest_framework as  filters
 from rest_framework.filters import SearchFilter , OrderingFilter
 from .filter import *
 from rest_framework import permissions
-from .permissions import CanModifyOrder
+from .permissions import CanModifyOrderStatus
+
+
 from datetime import timedelta, datetime , timezone
 from .utils import recalculate_order_total , remove_quantity_from_inventory , update_quantity_from_inventory
 from django.db import transaction
@@ -178,7 +180,7 @@ class AddToCartViewSet(generics.CreateAPIView):
 
 class OrderViewSet(viewsets.ViewSet):
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated, CanModifyOrder]
+    permission_classes = [IsAuthenticated]
     http_method_names = ['post', 'get','put','delete']
 
     def get_queryset(self):
@@ -326,7 +328,7 @@ class OrderViewSet(viewsets.ViewSet):
 
 class OrderItemViewset(viewsets.ViewSet):
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated, CanModifyOrder]
+    permission_classes = [IsAuthenticated]
     http_method_names = ['delete']
 
     def destroy(self, request, *args, **kwargs):
@@ -358,5 +360,34 @@ class OrderItemViewset(viewsets.ViewSet):
         recalculate_order_total(order)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+class OrderTrackingViewset(viewsets.ViewSet):
+    serializer_class = OrderSerializer
+    http_method_names = ['get','put']
+
+    def get_permissions(self): 
+        if self.request.method in ['PUT']: #only the admin can update or delete the product
+            return [IsAdminUser(),CanModifyOrderStatus]
+        return [IsAuthenticated()]
+    
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_staff:
+            return Order.objects.all()
+
+        if user.is_authenticated:
+            return Order.objects.filter(customer_id=user.id)
+        
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
 
 

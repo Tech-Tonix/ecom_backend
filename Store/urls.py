@@ -16,5 +16,7 @@ urlpatterns = router.urls +[
     path('orders/delete/<int:id>/', views.OrderViewSet.as_view({'delete':'destroy'})),
     path('orders/update/<int:order_id>/<int:order_item_id>/', views.OrderViewSet.as_view({'put': 'update'})),
     path('orders/delete-orderitem/<int:order_id>/<int:order_item_id>/', views.OrderItemViewset.as_view({'delete': 'destroy'})),
+    path('order-tracking/', views.OrderTrackingViewset.as_view({'get': 'list'}), name='order-tracking'),
+
 
 ]
