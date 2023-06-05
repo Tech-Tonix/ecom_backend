@@ -15,12 +15,12 @@ class ProductPhotoSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     categories_title= serializers.CharField(source = 'categories.title',read_only = True)
     reviews = ReviewSerializer(many=True,read_only = True)
-    images = ProductPhotoSerializer(many=True, read_only=True)
+    images = ProductPhotoSerializer(many=True, required = False)
     
     class Meta:
         model = Product
         fields = ['id', 'name', 'description','color','size','images',
-                  'unit_price', 'categories','categories_title','reviews']
+                  'unit_price', 'categories','categories_title','reviews','inventory']
 
 
 
