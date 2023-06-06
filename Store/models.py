@@ -29,6 +29,7 @@ class Product(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(1)])
     inventory = models.IntegerField(validators=[MinValueValidator(0)])
+    image_urls = models.JSONField(default=list)
     last_update = models.DateTimeField(auto_now=True)
     categories = models.ManyToManyField(Category, related_name='products')
     promotions = models.ManyToManyField(Promotion, blank=True)
@@ -45,8 +46,8 @@ class Product(models.Model):
 
 
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField( null=True, blank=True, upload_to = 'product_images/')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,)
+    #image = models.ImageField( null=True, blank=True, upload_to = 'product_images/')
 
 
 
