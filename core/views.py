@@ -1,8 +1,11 @@
-# from djoser.views import TokenCreateView
-# from rest_framework.permissions import AllowAny
-# from .serializers import LoginSerializer
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+# from rest_framework import status
+# from django.contrib.auth import logout
 
-# class LoginView(TokenCreateView):
-#     serializer_class = LoginSerializer
-#     permission_classes = [AllowAny]
-
+# class LogoutView(APIView):
+#     def post(self, request):
+#         logout(request)
+#         return Response(
+#             {"detail": "Successfully logged out."}, status=status.HTTP_200_OK
+#         )
