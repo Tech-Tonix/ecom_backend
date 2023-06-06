@@ -79,6 +79,7 @@ class Order(models.Model):
         max_length=1, choices=STATUS_CHOICES, default=STATUS_PENDING)
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    tracking_number = models.UUIDField(default=uuid4, editable=False)
 
 
     def __str__(self):

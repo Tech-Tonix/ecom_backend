@@ -374,20 +374,29 @@ class OrderTrackingViewset(viewsets.ViewSet):
         return [IsAuthenticated()]
     
 
-    def get_queryset(self):
-        user = self.request.user
+    # def get_queryset(self):
+    #     user = self.request.user
 
-        if user.is_staff:
-            return Order.objects.all()
+    #     if user.is_staff:
+    #         return Order.objects.all()
 
-        if user.is_authenticated:
-            return Order.objects.filter(customer_id=user.id)
+    #     if user.is_authenticated:
+    #         return Order.objects.filter(customer_id=user.id)
         
     
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.serializer_class(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        tracking_number = request.GET.get('tracking_number')
+        if tracking_number:
+            order = Order.objects.filter(tracking_number=tracking_number).first()
+            if order:
+                serializer = self.serializer_class(order)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({'error': 'Tracking number not provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+
     
 
 
