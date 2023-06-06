@@ -109,3 +109,13 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ('customer', 'items' ,'total_amount','placed_at','status','tracking_number')
+
+
+
+# class OrderSerializer(serializers.ModelSerializer):
+#     items = OrderItemSerializer(many=True, read_only=True)
+
+#     class Meta:
+#         model = Order
+#         fields = ('customer', 'items' ,'total_amount','placed_at','status','tracking_number')
+

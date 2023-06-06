@@ -97,3 +97,9 @@ class OrderItem(models.Model):
         return f"Order-item ID: {self.id} - Customer: {self.order.customer.email}"
 
 
+class OrdersArchive(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+
+    def __str__(self):
+          return f"Order ID: {self.order.id} - Customer: {self.order.customer.email}"
+
