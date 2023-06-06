@@ -14,7 +14,7 @@ from .permissions import CanModifyOrderStatus
 
 
 from datetime import timedelta, datetime , timezone
-from .utils import recalculate_order_total , remove_quantity_from_inventory , update_quantity_from_inventory
+from .utils import recalculate_order_total , remove_quantity_from_inventory , update_quantity_from_inventory, re_put_quantity_to_inventory
 from django.db import transaction
 
 
@@ -213,6 +213,15 @@ class OrderViewSet(viewsets.ViewSet):
                 {'error': 'No items found in the cart.'},
                 status=status.HTTP_400_BAD_REQUEST
             )      
+
+
+        for cart_item in cart_items:
+          if cart_item.quantity > cart_item.product.inventory:
+              return Response(
+                {'error': f"Insufficient inventory for product '{cart_item.product.name}'."},
+                status=status.HTTP_400_BAD_REQUEST
+              )
+
         total_amount = sum(item.product.unit_price * item.quantity for item in cart_items)
 
         order = Order.objects.create(
@@ -220,15 +229,25 @@ class OrderViewSet(viewsets.ViewSet):
             total_amount=total_amount,
         )
 
+        # archived_order = ArchivedOrder.objects.create(
+        #     customer=user,
+        #     total_amount=order.total_amount,
+        # ) 
+
         with transaction.atomic():
          for cart_item in cart_items:
-            # remove_quantity_from_inventory(cart_item) 
+            remove_quantity_from_inventory(cart_item) 
             OrderItem.objects.create(
                 order=order,
                 product=cart_item.product,
                 quantity=cart_item.quantity,
             )
 
+            # ArchivedOrderItems.objects.create(
+            #  archived_order=order,
+            #  product=cart_item.product,
+            #  quantity=cart_item.quantity,
+            # ) 
          cart_items.delete()
 
         serializer = OrderSerializer(order)
@@ -238,7 +257,7 @@ class OrderViewSet(viewsets.ViewSet):
 
 
     def destroy(self, request, *args, **kwargs):
-
+        user = self.request.user
         order_id = kwargs['id']
 
         order=Order.objects.get(id=order_id)
@@ -258,12 +277,16 @@ class OrderViewSet(viewsets.ViewSet):
                 {'error': 'The deletion window for this order has expired.'},
                 status=status.HTTP_403_FORBIDDEN
             )
-        
+ 
+        order_items=OrderItem.objects.filter(order=order)
+        for order_item in order_items:
+          re_put_quantity_to_inventory(order_item)
+          order_item.delete()
+
         order.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-
 
 
     def update(self, request, *args, **kwargs):
@@ -313,7 +336,7 @@ class OrderViewSet(viewsets.ViewSet):
                {'error': 'Invalid quantity value.'},
                status=status.HTTP_400_BAD_REQUEST
               )
-        # update_quantity_from_inventory(order_item,quantity)
+        update_quantity_from_inventory(order_item,quantity)
         
         order_item.quantity= quantity
 
@@ -369,20 +392,10 @@ class OrderTrackingViewset(viewsets.ViewSet):
     http_method_names = ['get','put']
 
     def get_permissions(self): 
-        if self.request.method in ['PUT']: #only the admin can update or delete the product
+        if self.request.method in ['PUT']:
             return [IsAdminUser(),CanModifyOrderStatus]
         return [IsAuthenticated()]
-    
-
-    # def get_queryset(self):
-    #     user = self.request.user
-
-    #     if user.is_staff:
-    #         return Order.objects.all()
-
-    #     if user.is_authenticated:
-    #         return Order.objects.filter(customer_id=user.id)
-        
+       
     
     def list(self, request, *args, **kwargs):
         tracking_number = request.GET.get('tracking_number')

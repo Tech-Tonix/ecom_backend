@@ -26,3 +26,12 @@ def update_quantity_from_inventory(order_item,quantity):
     product.save()
 
 
+def re_put_quantity_to_inventory(order_item):
+    product = order_item.product
+    quantity = order_item.quantity
+
+    # Update the product inventory by subtracting the quantity
+    product.inventory += quantity
+    product.save()
+
+
