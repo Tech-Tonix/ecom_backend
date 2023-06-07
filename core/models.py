@@ -41,7 +41,7 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     is_superuser=models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined=models.DateField(default=timezone.now())
-    # credit_card_info=
+    member_club_reduction= models.FloatField(default=0)
 
     objects= CustomUserManager()
     USERNAME_FIELD='email'

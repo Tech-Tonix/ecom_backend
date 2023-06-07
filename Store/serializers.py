@@ -54,7 +54,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class CartItemSerializer(serializers.ModelSerializer):
-    product = SimpleProductSerializer()
+    product = ProductSerializer()
     total_product_price = serializers.SerializerMethodField()
     total_price = serializers.SerializerMethodField()
 

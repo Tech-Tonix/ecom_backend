@@ -9,7 +9,7 @@ class UserCreateSerializer(BaseUserSerializer):
         model = CustomUser
         fields = ( 'email','password' ,'first_name', 'last_name', 'phone_number',
                   'birth_date','city', 'address', 'postal_code',
-                  'is_student', 'is_member_club')
+                  'is_student', 'is_member_club',)
 
 class UserSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):

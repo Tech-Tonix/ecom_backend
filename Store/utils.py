@@ -35,3 +35,10 @@ def re_put_quantity_to_inventory(order_item):
     product.save()
 
 
+def member_club_reduction(user,order):
+    if user.is_member_club:
+        if user.member_club_reduction>=50000 :
+           order.total_amount= order.total_price * 0.1 
+           user.member_club_reduction=0
+        else :
+           user.member_club_reduction= user.member_club_reduction + order.total_amount

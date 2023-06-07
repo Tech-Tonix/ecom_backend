@@ -14,7 +14,7 @@ from .permissions import CanModifyOrderStatus
 
 
 from datetime import timedelta, datetime , timezone
-from .utils import recalculate_order_total , remove_quantity_from_inventory , update_quantity_from_inventory, re_put_quantity_to_inventory
+from .utils import recalculate_order_total , remove_quantity_from_inventory , update_quantity_from_inventory, re_put_quantity_to_inventory, member_club_reduction
 from django.db import transaction
 
 
@@ -249,7 +249,7 @@ class OrderViewSet(viewsets.ViewSet):
             #  quantity=cart_item.quantity,
             # ) 
          cart_items.delete()
-
+        member_club_reduction(user,order)
         serializer = OrderSerializer(order)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
