@@ -1,25 +1,25 @@
-from .models import  Category, Product, CartItem  , Order , OrderItem,ProductImage
+from .models import  Category, Product, CartItem  , Order , OrderItem
 from rest_framework import serializers
 from core.models import CustomUser
 from django.db import transaction
 from Reviews.serializers import *
 
 
-class ProductPhotoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductImage
-        fields = ('id', 'image')
+# class ProductPhotoSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ProductImage
+#         fields = ('id', 'image')
 
 
 
 class ProductSerializer(serializers.ModelSerializer):
     categories_title= serializers.CharField(source = 'categories.title',read_only = True)
     reviews = ReviewSerializer(many=True,read_only = True)
-    images = ProductPhotoSerializer(many=True,required=False)
+    # images = ProductPhotoSerializer(many=True,required=False)
     
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description','color','size','images','image_urls',
+        fields = ['id', 'name', 'description','color','size','image_urls',
                   'unit_price', 'categories','categories_title','reviews','inventory']
 
 
@@ -31,11 +31,12 @@ class ProductSerializer(serializers.ModelSerializer):
 #                    'unit_price', 'categories','categories_title','image','reviews']
         
 
+
 class SimpleProductSerializer(serializers.ModelSerializer):
-    images = ProductPhotoSerializer(many=True, read_only=True)
     class Meta:
         model = Product
-        fields = ['id','name', 'unit_price','color','size','images']
+        fields = ['id','name', 'unit_price','color','size']
+
 
 
 

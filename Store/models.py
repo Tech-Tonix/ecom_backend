@@ -5,9 +5,9 @@ from core.models import CustomUser
 
 
 
-class Promotion(models.Model):
-    description = models.CharField(max_length=255)
-    discount = models.FloatField()
+# class Promotion(models.Model):
+#     description = models.CharField(max_length=255)
+#     discount = models.FloatField()
 
 
 
@@ -30,7 +30,7 @@ class Product(models.Model):
     image_urls = models.JSONField(default=list)
     last_update = models.DateTimeField(auto_now=True)
     categories = models.ManyToManyField(Category, related_name='products')
-    promotions = models.ManyToManyField(Promotion, blank=True)
+    # promotions = models.ManyToManyField(Promotion, blank=True)
     rating_rv = models.FloatField(default=0)
     rating_nb = models.PositiveIntegerField(default=0)
     # image = models.ImageField(blank=True, null=True,upload_to='product_images/')
@@ -43,9 +43,9 @@ class Product(models.Model):
 
 
 
-class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE,)
-    #image = models.ImageField( null=True, blank=True, upload_to = 'product_images/')
+# class ProductImage(models.Model):
+#     product = models.ForeignKey(Product, on_delete=models.CASCADE,)
+#     #image = models.ImageField( null=True, blank=True, upload_to = 'product_images/')
 
 
 
@@ -121,10 +121,10 @@ class ArchivedOrder(models.Model):
 
 
 class ArchivedOrderItems(models.Model):
-    archived_order = models.ForeignKey(Order, on_delete=models.CASCADE,related_name='archived_items')
+    archived_order = models.ForeignKey(ArchivedOrder, on_delete=models.CASCADE,related_name='archived_items')
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='archived_item')
     quantity = models.PositiveSmallIntegerField()
 
 
     def __str__(self):
-        return f"Archived_Order-item ID: {self.id} - Customer: {self.order.customer.email}"
+        return f"Archived_Order-item ID: {self.id} - Customer: {self.archived_order.customer.email}"

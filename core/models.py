@@ -30,7 +30,7 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     email=models.EmailField(max_length=60, unique=True)
     phone_number=models.CharField(max_length=10,validators=[RegexValidator(regex='^[0-9]+$')])
     birth_date=models.DateField(default=None,null=True)
-    profile_image=models.ImageField(null=True,blank=True)
+    profile_image=models.ImageField(null=True,blank=True,upload_to='profile_images/')
     city=models.CharField(max_length=10)
     address=models.CharField(max_length=60)
     postal_code=models.CharField(max_length=5,validators=[RegexValidator(regex='^[0-9]+$')])
@@ -45,7 +45,7 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
 
     objects= CustomUserManager()
     USERNAME_FIELD='email'
-    REQUIRED_FIELDS = ['first_name','city','address','postal_code','member_club_reduction']
+    REQUIRED_FIELDS = ['first_name','city','address','postal_code','member_club_reduction','profile_image']
 
     def __str__(self) :
         return  self.email

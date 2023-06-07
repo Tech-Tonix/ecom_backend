@@ -220,10 +220,10 @@ class OrderViewSet(viewsets.ViewSet):
             total_amount=total_amount,
         )
 
-        # archived_order = ArchivedOrder.objects.create(
-        #     customer=user,
-        #     total_amount=order.total_amount,
-        # ) 
+        archived_order = ArchivedOrder.objects.create(
+            customer=user,
+            total_amount=order.total_amount,
+        ) 
 
         with transaction.atomic():
          for cart_item in cart_items:
@@ -234,11 +234,12 @@ class OrderViewSet(viewsets.ViewSet):
                 quantity=cart_item.quantity,
             )
 
-            # ArchivedOrderItems.objects.create(
-            #  archived_order=order,
-            #  product=cart_item.product,
-            #  quantity=cart_item.quantity,
-            # ) 
+            ArchivedOrderItems.objects.create(
+             archived_order=archived_order,
+             product=cart_item.product,
+             quantity=cart_item.quantity,
+            ) 
+
          cart_items.delete()
         member_club_reduction(user,order)
         serializer = OrderSerializer(order)
