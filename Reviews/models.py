@@ -6,10 +6,7 @@ from core.models import *
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    title = models.CharField(max_length=255)
     content = models.TextField()
-    rating = models.PositiveIntegerField()
-    image = models.ImageField(blank=True, null=True)
     active = models.BooleanField(default=True)
     # created_at = models.DateTimeField(auto_now_add=True)
     # updated_at = models.DateTimeField(auto_now=True)

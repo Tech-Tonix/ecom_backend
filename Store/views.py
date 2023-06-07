@@ -21,30 +21,21 @@ from django.db import transaction
 
 class ProductsViewSet(viewsets.ModelViewSet):
 
-    queryset = Product.objects.all()
+    # queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [filters.DjangoFilterBackend,SearchFilter,OrderingFilter]
     filterset_class = ProductFilter
     search_fields = ['name','unit_price','categories__title','promotions__discount']
     order_fields = ['name','unit_price','promotions__discount','inventory']
 
-    # def get_serializer_class(self):
-    #     if self.action == 'list' and 'clothes' in self.request.path:
-    #         return ClothesSerializer
-    #     return self.serializer_class
-
-    # def get_queryset(self):
-    #     if 'clothes' in self.request.path:
-    #         return Clothes.objects.all()
-    #     return super().get_queryset()
-
     def get_permissions(self): 
         if self.request.method in ['PATCH', 'DELETE','POST','PUT']: #only the admin can update or delete the product
             return [IsAdminUser()]
         return []
 
-    # def get_serializer_context(self):
-    #     return {'request': self.request}
+    def get_queryset(self):
+        return Product.objects.filter(inventory__gt=0)
+
 
     def destroy(self, request, *args, **kwargs):
         if OrderItem.objects.filter(product_id=kwargs['pk']).count() > 0:
