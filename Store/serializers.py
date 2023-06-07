@@ -23,13 +23,7 @@ class ProductSerializer(serializers.ModelSerializer):
                   'unit_price', 'categories','categories_title','reviews','inventory']
 
 
-
-# class ClothesSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Clothes
-#         fields = ['id', 'name', 'description','size','color', 
-#                    'unit_price', 'categories','categories_title','image','reviews']
-        
+    
 
 
 class SimpleProductSerializer(serializers.ModelSerializer):
