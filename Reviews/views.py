@@ -23,24 +23,27 @@ class ReviewCreateAPIView(generics.CreateAPIView):
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticated]
     queryset = Review.objects.all()
-    def perform_create(self,serializer):
-        pk = self.kwargs.get('pk')
-        productlist = Product.objects.get(pk=pk)
-        review_user = self.request.user
-        print(review_user)
-        review = Review.objects.filter(product=productlist,user=review_user)
-        if review.exists():
-            raise  ValidationError('you have already a review')
-        if productlist.rating_nb == 0:
-            # serializer.validated_data['rating'] or self.request.data['rating'] but with int
+
+    def perform_create(self, serializer):
+      pk = self.kwargs.get('pk')
+      productlist = Product.objects.get(pk=pk)
+      review_user = self.request.user
+      print(review_user)
+      review = Review.objects.filter(product=productlist, user=review_user)
+      if review.exists():
+        raise ValidationError('You have already submitted a review.')
+    
+      if 'rating' in serializer.validated_data:
+
+         if productlist.rating_nb == 0:
             productlist.rating_rv = serializer.validated_data['rating']
-        else :
-            productlist.rating_rv = (productlist.rating_rv + serializer.validated_data['rating'])/2
-        productlist.rating_nb = productlist.rating_nb +1
-            
-        productlist.save()
-        serializer.save(product=productlist,user=review_user  )
-        
+         else:
+            productlist.rating_rv = (productlist.rating_rv + serializer.validated_data['rating']) / 2
+         productlist.rating_nb += 1
+         productlist.save()
+
+      serializer.save(product=productlist, user=review_user)
+
 class ReviewRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
