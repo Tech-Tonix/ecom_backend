@@ -4,7 +4,8 @@ from Store.serializers import SimpleProductSerializer , ProductSerializer
 
 
 class FavoritesItemSerializer(serializers.ModelSerializer):
-    product = SimpleProductSerializer(read_only = True)
+    product = ProductSerializer(read_only = True)
+    # image_urls = serializers.JSONField(source='product.image_urls', read_only=True)
     class Meta:
         model = FavoritesItem
         fields=['product', 'customer','quantity']

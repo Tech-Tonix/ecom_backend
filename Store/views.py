@@ -25,8 +25,8 @@ class ProductsViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     filter_backends = [filters.DjangoFilterBackend,SearchFilter,OrderingFilter]
     filterset_class = ProductFilter
-    search_fields = ['name','unit_price','categories__title','promotions__discount']
-    order_fields = ['name','unit_price','promotions__discount','inventory']
+    search_fields = ['name','unit_price','categories__title','discount']
+    order_fields = ['name','unit_price','discount','inventory']
 
     def get_permissions(self): 
         if self.request.method in ['PATCH', 'DELETE','POST','PUT']: #only the admin can update or delete the product
