@@ -4,8 +4,14 @@ from .models import Product , Category , CartItem ,Order, OrderItem , ArchivedOr
 class ProductAdmin(admin.ModelAdmin):
 
     search_fields = ['name', 'description']  
-    list_display = ['name','unit_price','inventory','discount']  
+    list_display = ['name','dinar_price','inventory','discount']  
     list_filter = ['categories','rating_rv','color','discount'] 
+
+    def dinar_price(self, obj):
+        # Multiply the price by 170
+        return obj.unit_price * 170
+
+    dinar_price.short_description = ' Price DZ'
 
 
 admin.site.register(Product, ProductAdmin)
@@ -44,6 +50,13 @@ class ArchivedOrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'customer', 'status', 'placed_at', 'total_amount']
     list_filter = ['status', 'placed_at']
     search_fields = ['id', 'customer__email']
+    def total_amount_dz(self, obj):
+        # Multiply the price by 170
+        return obj.total_amount * 170
+
+    total_amount_dz.short_description = ' total amount DZ'
+
+
 
 admin.site.register(ArchivedOrder, ArchivedOrderAdmin)
 # admin.site.register(ArchivedOrder)

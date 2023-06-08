@@ -18,5 +18,18 @@ class CustomUserAdmin(UserAdmin):
         ('Important Dates', {'fields': ('last_login', 'date_joined')}),
     )
 
+    # def get_fields(self, request, obj=None):
+    #     fields = super().get_fields(request, obj=obj)
+    #     if obj and obj.is_member_club:
+    #         fields += ('member_club_reduction_limit',)  # Add the calculated field when is_member_club is True
+    #     return fields
+
+    # def member_club_reduction_limit(self, obj):
+    #     # Multiply the price by 170
+    #     return obj.member_club_reduction * 170
+
+    # member_club_reduction_limit.short_description = ' Price DZ'
+
+
 
 admin.site.register(CustomUser, CustomUserAdmin)

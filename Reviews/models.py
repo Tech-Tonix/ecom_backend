@@ -6,7 +6,7 @@ from core.models import *
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    content = models.TextField()
+    content = models.TextField(blank=True)
     rating = models.PositiveIntegerField(blank=True, null=True,default=None)
     active = models.BooleanField(default=True)
 
